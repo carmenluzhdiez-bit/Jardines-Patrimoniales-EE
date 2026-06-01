@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jardines Patrimoniales — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --green-950: #0d1f07;
+  --green-900: #1a3d0e;
+  --green-800: #27500a;
+  --green-700: #3b6d11;
+  --green-600: #4d8a16;
+  --green-500: #639922;
+  --green-400: #7db32e;
+  --green-300: #97c459;
+  --green-200: #c0dd97;
+  --green-100: #e0f0be;
+  --green-50:  #f2f9e6;
+  --earth-900: #2c1a08;
+  --earth-700: #6b3d1a;
+  --earth-500: #a0622e;
+  --earth-300: #c89468;
+  --earth-100: #f0e0cc;
+  --stone-900: #1c1c1a;
+  --stone-800: #2e2e2b;
+  --stone-700: #3f3f3b;
+  --stone-500: #6b6b66;
+  --stone-300: #b0b0aa;
+  --stone-100: #e8e8e4;
+  --stone-50:  #f5f5f2;
+  --cream: #faf9f5;
+  --white: #ffffff;
+  --danger: #c0392b;
+  --danger-bg: #fdf0ee;
+  --warn: #d68910;
+  --warn-bg: #fef9ec;
+  --info: #1a6fa8;
+  --info-bg: #eaf3fb;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.10);
+  --sidebar-w: 220px;
+  --topbar-h: 60px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--stone-50);
+  color: var(--stone-900);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ── SIDEBAR ───────────────────────────────────────── */
+#sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--green-900);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+.sb-logo {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.sb-logo-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--green-100);
+  line-height: 1.2;
+}
+.sb-logo-sub {
+  font-size: 11px;
+  color: var(--green-400);
+  margin-top: 3px;
+  letter-spacing: .03em;
+}
+.sb-nav { padding: 10px 0; flex: 1; }
+.sb-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  color: var(--green-500);
+  text-transform: uppercase;
+  padding: 14px 18px 6px;
+}
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  font-size: 13px;
+  color: var(--green-200);
+  cursor: pointer;
+  border-radius: 0;
+  transition: all .15s;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+}
+.sb-item i { font-size: 17px; opacity: .75; }
+.sb-item:hover { background: rgba(255,255,255,.06); color: var(--white); }
+.sb-item.active {
+  background: rgba(255,255,255,.1);
+  color: var(--white);
+  border-left-color: var(--green-300);
+  font-weight: 500;
+}
+.sb-item.active i { opacity: 1; }
+.sb-footer {
+  padding: 14px 18px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  font-size: 11px;
+  color: var(--green-500);
+}
+
+/* ── MAIN ──────────────────────────────────────────── */
+#main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── TOPBAR ────────────────────────────────────────── */
+#topbar {
+  height: var(--topbar-h);
+  background: var(--white);
+  border-bottom: 1px solid var(--stone-100);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+#page-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--green-900);
+  flex: 1;
+}
+.tb-badge {
+  font-size: 11px;
+  background: var(--green-50);
+  color: var(--green-700);
+  border: 1px solid var(--green-200);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+#today-label {
+  font-size: 12px;
+  color: var(--stone-500);
+}
+
+/* ── CONTENT ───────────────────────────────────────── */
+#content {
+  padding: 24px 28px;
+  flex: 1;
+}
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ── CARDS & GRIDS ─────────────────────────────────── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--stone-100);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--green-900);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title i { font-size: 17px; color: var(--green-600); }
+
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+.grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 20px; }
+
+/* ── KPI CARDS ─────────────────────────────────────── */
+.kpi {
+  background: var(--white);
+  border: 1px solid var(--stone-100);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.kpi.green::before { background: var(--green-500); }
+.kpi.earth::before { background: var(--earth-500); }
+.kpi.blue::before { background: var(--info); }
+.kpi.red::before { background: var(--danger); }
+.kpi-icon { font-size: 22px; color: var(--green-500); margin-bottom: 2px; }
+.kpi.earth .kpi-icon { color: var(--earth-500); }
+.kpi.blue .kpi-icon { color: var(--info); }
+.kpi.red .kpi-icon { color: var(--danger); }
+.kpi-val { font-size: 28px; font-weight: 600; color: var(--stone-900); line-height: 1; }
+.kpi-label { font-size: 12px; color: var(--stone-500); }
+.kpi-delta { font-size: 11px; font-weight: 500; }
+.kpi-delta.up { color: var(--green-600); }
+.kpi-delta.down { color: var(--danger); }
+
+/* ── FORMS ─────────────────────────────────────────── */
+.form-row { margin-bottom: 12px; }
+.form-label { font-size: 12px; color: var(--stone-500); font-weight: 500; margin-bottom: 4px; display: block; }
+input[type=text], input[type=date], input[type=tel], input[type=number], select, textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--stone-100);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 13px;
+  background: var(--cream);
+  color: var(--stone-900);
+  outline: none;
+  transition: border-color .15s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--green-400); background: var(--white); }
+textarea { resize: vertical; min-height: 72px; }
+
+/* ── BUTTONS ───────────────────────────────────────── */
+.btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--stone-100);
+  background: var(--white);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--stone-700);
+  transition: all .15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+.btn:hover { background: var(--stone-50); border-color: var(--stone-300); }
+.btn:active { transform: scale(.98); }
+.btn-primary { background: var(--green-700); color: var(--white); border-color: var(--green-700); }
+.btn-primary:hover { background: var(--green-800); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-danger { color: var(--danger); }
+.btn-danger:hover { background: var(--danger-bg); }
+.btn-wa { background: #25D366; color: var(--white); border-color: #25D366; }
+.btn-wa:hover { background: #1da851; }
+.btn-sms { background: var(--info); color: var(--white); border-color: var(--info); }
+.btn-sms:hover { background: #145d8a; }
+
+/* ── BADGES ────────────────────────────────────────── */
+.badge {
+  font-size: 11px; padding: 2px 9px;
+  border-radius: 20px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.b-green { background: var(--green-50); color: var(--green-800); border: 1px solid var(--green-200); }
+.b-amber { background: var(--warn-bg); color: var(--warn); border: 1px solid #f5d87a; }
+.b-red   { background: var(--danger-bg); color: var(--danger); border: 1px solid #f5b7b1; }
+.b-blue  { background: var(--info-bg); color: var(--info); border: 1px solid #a8d4f0; }
+.b-gray  { background: var(--stone-50); color: var(--stone-500); border: 1px solid var(--stone-100); }
+.b-earth { background: #fdf4ee; color: var(--earth-700); border: 1px solid #e8c9a8; }
+.b-teal  { background: #eaf7f3; color: #0d6e4f; border: 1px solid #8dd4be; }
+
+/* ── TASK LIST ─────────────────────────────────────── */
+.task-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--stone-50);
+}
+.task-item:last-child { border-bottom: none; }
+.task-check {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--stone-300);
+  flex-shrink: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px; transition: all .2s;
+}
+.task-check.done { background: var(--green-500); border-color: var(--green-500); color: var(--white); }
+.task-name { font-size: 13px; font-weight: 500; color: var(--stone-900); }
+.task-name.done { text-decoration: line-through; color: var(--stone-300); }
+.task-meta { font-size: 11px; color: var(--stone-500); margin-top: 3px; display: flex; gap: 10px; flex-wrap: wrap; }
+.task-obs {
+  font-size: 11px; color: var(--stone-500); margin-top: 6px;
+  padding: 5px 10px; background: var(--stone-50);
+  border-radius: var(--radius-sm); border-left: 3px solid var(--green-300);
+}
+.task-report {
+  font-size: 11px; color: var(--green-700); margin-top: 4px;
+  padding: 5px 10px; background: var(--green-50);
+  border-radius: var(--radius-sm); border-left: 3px solid var(--green-400);
+}
+
+/* ── AVATAR ────────────────────────────────────────── */
+.avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+}
+
+/* ── WORKER ROW ────────────────────────────────────── */
+.wrow { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--stone-50); }
+.wrow:last-child { border-bottom: none; }
+.wname { font-size: 13px; font-weight: 500; }
+.wmeta { font-size: 11px; color: var(--stone-500); }
+
+/* ── PROGRESS BAR ──────────────────────────────────── */
+.pbar { height: 6px; background: var(--stone-100); border-radius: 3px; overflow: hidden; }
+.pbar-fill { height: 100%; background: var(--green-500); border-radius: 3px; transition: width .4s ease; }
+.pbar-fill.warn { background: var(--warn); }
+.pbar-fill.danger { background: var(--danger); }
+
+/* ── HISTORY ACCORDION ─────────────────────────────── */
+.hday {
+  border: 1px solid var(--stone-100);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.hday-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; cursor: pointer; background: var(--white);
+  transition: background .15s;
+}
+.hday-header:hover { background: var(--stone-50); }
+.hday-date { font-size: 13px; font-weight: 600; color: var(--stone-900); }
+.hday-sub { font-size: 11px; color: var(--stone-500); margin-top: 2px; }
+.hday-body { display: none; padding: 12px 16px; background: var(--cream); border-top: 1px solid var(--stone-100); }
+.hday.open .hday-body { display: block; }
+
+/* ── MAP ZONE ──────────────────────────────────────── */
+.zone-map {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: var(--green-50);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--green-200);
+  overflow: hidden;
+}
+.zone-blob {
+  position: absolute;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all .2s;
+  font-size: 10px; font-weight: 600;
+  text-align: center; line-height: 1.2;
+  border: 2px solid rgba(255,255,255,.5);
+}
+.zone-blob:hover { transform: scale(1.08); z-index: 10; }
+.zone-blob.z-green { background: rgba(97,153,34,.75); color: var(--white); }
+.zone-blob.z-blue  { background: rgba(26,111,168,.75); color: var(--white); }
+.zone-blob.z-earth { background: rgba(160,98,46,.75); color: var(--white); }
+.zone-blob.z-warn  { background: rgba(214,137,16,.75); color: var(--white); }
+.zone-blob.z-red   { background: rgba(192,57,43,.75); color: var(--white); }
+.zone-blob.z-teal  { background: rgba(13,110,79,.75); color: var(--white); }
+.zone-tooltip {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  background: var(--stone-900); color: var(--white);
+  font-size: 11px; padding: 5px 10px; border-radius: var(--radius-sm);
+  white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity .2s;
+}
+.zone-blob:hover .zone-tooltip { opacity: 1; }
+.map-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.map-leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--stone-500); }
+.map-leg-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* ── CHART CONTAINER ───────────────────────────────── */
+.chart-wrap { position: relative; }
+
+/* ── FILTER BAR ────────────────────────────────────── */
+.filter-bar { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.fchip {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--stone-100); background: var(--white);
+  font-size: 12px; cursor: pointer; color: var(--stone-500);
+  font-family: var(--font-body); transition: all .15s; font-weight: 500;
+}
+.fchip.active { background: var(--green-700); color: var(--white); border-color: var(--green-700); }
+.fchip:hover:not(.active) { border-color: var(--stone-300); color: var(--stone-700); }
+
+/* ── SEPARATOR ─────────────────────────────────────── */
+.sep { height: 1px; background: var(--stone-100); margin: 14px 0; }
+
+/* ── SECTION LABEL ─────────────────────────────────── */
+.slbl {
+  font-size: 10px; font-weight: 600; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--stone-500); margin-bottom: 10px;
+}
+
+/* ── TABS (sub) ────────────────────────────────────── */
+.stabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--stone-100); }
+.stab {
+  padding: 8px 16px; border: none; background: transparent;
+  font-family: var(--font-body); font-size: 13px; cursor: pointer;
+  color: var(--stone-500); font-weight: 500;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: all .15s;
+}
+.stab.active { color: var(--green-700); border-bottom-color: var(--green-600); }
+.stab:hover:not(.active) { color: var(--stone-700); }
+
+/* ── MSG PREVIEW ───────────────────────────────────── */
+.msg-preview {
+  background: var(--cream); border: 1px solid var(--stone-100);
+  border-radius: var(--radius-md); padding: 12px 16px;
+  font-size: 12px; color: var(--stone-700); white-space: pre-wrap;
+  line-height: 1.65; font-family: 'Courier New', monospace;
+  max-height: 220px; overflow-y: auto;
+}
+
+/* ── MOBILE FRAME ──────────────────────────────────── */
+.phone-frame {
+  width: 100%; max-width: 320px; margin: 0 auto;
+  border: 8px solid var(--stone-800); border-radius: 36px;
+  overflow: hidden; background: var(--white);
+  box-shadow: 0 8px 32px rgba(0,0,0,.15);
+}
+.phone-bar {
+  background: var(--green-800); padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.phone-bar-title { color: var(--green-100); font-size: 14px; font-weight: 600; }
+.phone-bar-sub { color: var(--green-400); font-size: 11px; }
+.phone-task {
+  padding: 12px 16px; border-bottom: 1px solid var(--stone-50);
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.phone-task:last-child { border-bottom: none; }
+
+/* ── EMPTY STATE ───────────────────────────────────── */
+.empty {
+  text-align: center; padding: 2.5rem 1rem;
+  color: var(--stone-500); font-size: 13px;
+}
+.empty i { font-size: 36px; display: block; margin-bottom: 10px; color: var(--stone-300); }
+
+/* ── REPORT TABLE ──────────────────────────────────── */
+.rep-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.rep-table th {
+  text-align: left; padding: 8px 12px;
+  background: var(--stone-50); color: var(--stone-500);
+  font-weight: 600; font-size: 11px; letter-spacing: .04em; text-transform: uppercase;
+  border-bottom: 1px solid var(--stone-100);
+}
+.rep-table td { padding: 9px 12px; border-bottom: 1px solid var(--stone-50); color: var(--stone-700); }
+.rep-table tr:last-child td { border-bottom: none; }
+.rep-table tr:hover td { background: var(--stone-50); }
+
+/* ── SCROLLBAR ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--stone-200, #d0d0cc); border-radius: 3px; }
+
+/* ── ANIMATIONS ────────────────────────────────────── */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.panel.active { animation: fadeIn .25s ease; }
+
+/* ── RESPONSIVE ────────────────────────────────────── */
+@media (max-width: 900px) {
+  :root { --sidebar-w: 60px; }
+  .sb-logo-title, .sb-logo-sub, .sb-section-label, .sb-item span, .sb-footer { display: none; }
+  .sb-item { justify-content: center; padding: 12px; }
+  .sb-item i { font-size: 20px; }
+  #content { padding: 16px; }
+  .grid-4 { grid-template-columns: repeat(2,1fr); }
+  .grid-2-1, .grid-1-2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-title">Jardines<br>Patrimoniales</div>
+    <div class="sb-logo-sub">10 hectáreas · Supervisión</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section-label">Operaciones</div>
+    <a class="sb-item active" onclick="sw('dash',this)"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></a>
+    <a class="sb-item" onclick="sw('programar',this)"><i class="ti ti-calendar-plus"></i><span>Programar labores</span></a>
+    <a class="sb-item" onclick="sw('labores',this)"><i class="ti ti-checklist"></i><span>Labores del día</span></a>
+    <a class="sb-item" onclick="sw('mapa',this)"><i class="ti ti-map-2"></i><span>Mapa de zonas</span></a>
+    <div class="sb-section-label">Equipo</div>
+    <a class="sb-item" onclick="sw('personal',this)"><i class="ti ti-users"></i><span>Personal</span></a>
+    <a class="sb-item" onclick="sw('movil',this)"><i class="ti ti-device-mobile"></i><span>Envío móvil</span></a>
+    <div class="sb-section-label">Análisis</div>
+    <a class="sb-item" onclick="sw('historial',this)"><i class="ti ti-history"></i><span>Historial</span></a>
+    <a class="sb-item" onclick="sw('reporte',this)"><i class="ti ti-chart-bar"></i><span>Reportes</span></a>
+  </nav>
+  <div class="sb-footer"><span>v2.0 · 2025</span></div>
+</aside>
+
+<!-- MAIN -->
+<main id="main">
+  <div id="topbar">
+    <div id="page-title">Dashboard</div>
+    <span class="tb-badge" id="today-label"></span>
+    <button class="btn btn-sm btn-primary" onclick="sw('programar', document.querySelector('[onclick*=programar]'))">
+      <i class="ti ti-plus"></i> Nueva labor
+    </button>
+  </div>
+
+  <div id="content">
+
+    <!-- ══════════ DASHBOARD ══════════ -->
+    <div id="panel-dash" class="panel active">
+      <div class="grid-4" id="kpis"></div>
+      <div class="grid-2-1">
+        <div class="card">
+          <div class="card-title"><i class="ti ti-chart-line"></i>Labores completadas — últimas 2 semanas</div>
+          <div class="chart-wrap" style="height:220px"><canvas id="chart-trend"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-chart-donut"></i>Estado actual</div>
+          <div class="chart-wrap" style="height:180px"><canvas id="chart-estado"></canvas></div>
+          <div id="estado-leyenda" style="margin-top:10px"></div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><i class="ti ti-alert-triangle"></i>Tareas urgentes hoy</div>
+          <div id="dash-urgentes"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-trophy"></i>Rendimiento del equipo</div>
+          <div id="dash-equipo"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-notes"></i>Incidencias recientes</div>
+        <div id="dash-incidencias"></div>
+      </div>
+    </div>
+
+    <!-- ══════════ PROGRAMAR ══════════ -->
+    <div id="panel-programar" class="panel">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><i class="ti ti-calendar-plus"></i>Nueva labor</div>
+          <div class="grid-2">
+            <div class="form-row"><label class="form-label">Fecha</label><input type="date" id="f-fecha"></div>
+            <div class="form-row"><label class="form-label">Turno</label>
+              <select id="f-turno">
+                <option>Mañana (07:00–12:00)</option>
+                <option>Tarde (13:00–18:00)</option>
+                <option>Jornada completa</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row"><label class="form-label">Zona</label>
+            <select id="f-zona">
+              <option>Jardín de rosales</option><option>Arboretum</option>
+              <option>Pradera principal</option><option>Setos y borduras</option>
+              <option>Estanque y zona húmeda</option><option>Invernadero patrimonial</option>
+              <option>Caminos y accesos</option><option>Zona de compost</option>
+              <option>Pérgolas y estructuras</option><option>General</option>
+            </select>
+          </div>
+          <div class="form-row"><label class="form-label">Tipo de labor</label>
+            <select id="f-labor">
+              <option>Poda de mantenimiento</option><option>Poda formativa</option>
+              <option>Poda fitosanitaria</option><option>Riego manual</option>
+              <option>Fertilización foliar</option><option>Fertilización edáfica</option>
+              <option>Control de malezas</option><option>Tratamiento fitosanitario</option>
+              <option>Trasplante de especies</option><option>Siembra directa</option>
+              <option>Escarificación de suelo</option><option>Mantención de drenajes</option>
+              <option>Limpieza y recolección</option><option>Inventario de especies</option>
+              <option>Inspección fitosanitaria</option><option>Reparación de estructuras</option>
+              <option>Aplicación de mulch</option><option>Otra</option>
+            </select>
+          </div>
+          <div class="grid-2">
+            <div class="form-row"><label class="form-label">Jardinero</label><select id="f-jard"><option value="">— Sin asignar —</option></select></div>
+            <div class="form-row"><label class="form-label">Prioridad</label>
+              <select id="f-prior"><option value="Alta">🔴 Alta</option><option value="Media" selected>🟡 Media</option><option value="Baja">🟢 Baja</option></select>
+            </div>
+          </div>
+          <div class="form-row"><label class="form-label">Instrucciones / observaciones</label>
+            <textarea id="f-obs" placeholder="Herramientas requeridas, productos, cuidados especiales, EPI..."></textarea>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-sm" onclick="clearF()"><i class="ti ti-refresh"></i> Limpiar</button>
+            <button class="btn btn-sm btn-primary" onclick="addTask()"><i class="ti ti-plus"></i> Agregar</button>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title"><i class="ti ti-map-pin"></i>Avance por zona hoy</div>
+            <div id="zonas-prog"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><i class="ti ti-chart-pie"></i>Por tipo de labor</div>
+            <div class="chart-wrap" style="height:160px"><canvas id="chart-labor-tipos"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ LABORES ══════════ -->
+    <div id="panel-labores" class="panel">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+        <div class="filter-bar" style="margin:0;flex:1">
+          <button class="fchip active" onclick="setF('todos',this)">Todos</button>
+          <button class="fchip" onclick="setF('pendiente',this)">Pendientes</button>
+          <button class="fchip" onclick="setF('completado',this)">Completados</button>
+          <button class="fchip" onclick="setF('Alta',this)">Alta prioridad</button>
+          <button class="fchip" onclick="setF('incidencia',this)">Con incidencia</button>
+        </div>
+        <input type="date" id="f-filtro-fecha" style="width:auto;font-size:12px;padding:6px 10px" onchange="renderTareas()">
+        <button class="btn btn-sm" onclick="exportCSV()"><i class="ti ti-download"></i> CSV</button>
+      </div>
+      <div class="card">
+        <div id="lista-tareas"></div>
+      </div>
+    </div>
+
+    <!-- ══════════ MAPA ══════════ -->
+    <div id="panel-mapa" class="panel">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><i class="ti ti-map-2"></i>Plano de zonas — 10 ha</div>
+          <div class="zone-map" id="zone-map">
+            <!-- zonas se generan por JS -->
+          </div>
+          <div class="map-legend">
+            <div class="map-leg-item"><div class="map-leg-dot" style="background:var(--green-500)"></div> Al día</div>
+            <div class="map-leg-item"><div class="map-leg-dot" style="background:var(--warn)"></div> En progreso</div>
+            <div class="map-leg-item"><div class="map-leg-dot" style="background:var(--danger)"></div> Atención requerida</div>
+            <div class="map-leg-item"><div class="map-leg-dot" style="background:var(--info)"></div> Zona húmeda</div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title"><i class="ti ti-info-circle"></i>Detalle de zona seleccionada</div>
+            <div id="zona-detalle"><div class="empty"><i class="ti ti-cursor"></i>Haz clic en una zona del mapa para ver detalles.</div></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><i class="ti ti-list"></i>Resumen todas las zonas</div>
+            <div id="zonas-resumen-mapa"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PERSONAL ══════════ -->
+    <div id="panel-personal" class="panel">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><i class="ti ti-user-plus"></i>Registrar jardinero</div>
+          <div class="form-row"><label class="form-label">Nombre completo</label><input type="text" id="p-nombre" placeholder="Ej: Carlos Mendoza"></div>
+          <div class="form-row"><label class="form-label">Especialidad</label>
+            <select id="p-esp">
+              <option>Jardinero general</option><option>Podador especialista</option>
+              <option>Fitosanitario</option><option>Horticultor</option>
+              <option>Operario de maquinaria</option><option>Supervisor de zona</option>
+            </select>
+          </div>
+          <div class="form-row"><label class="form-label">Teléfono (WhatsApp/SMS)</label><input type="tel" id="p-tel" placeholder="+56 9 1234 5678"></div>
+          <div class="form-row"><label class="form-label">Zona principal asignada</label>
+            <select id="p-zona">
+              <option>General</option><option>Jardín de rosales</option><option>Arboretum</option>
+              <option>Pradera principal</option><option>Setos y borduras</option>
+              <option>Estanque y zona húmeda</option><option>Invernadero patrimonial</option>
+              <option>Caminos y accesos</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="addPersonal()"><i class="ti ti-user-check"></i> Registrar</button>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-users"></i>Equipo activo</div>
+          <div id="lista-personal"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-bar"></i>Rendimiento acumulado por jardinero</div>
+        <div class="chart-wrap" style="height:200px"><canvas id="chart-personal"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ══════════ MÓVIL ══════════ -->
+    <div id="panel-movil" class="panel">
+      <div class="stabs">
+        <button class="stab active" onclick="swSub(this,'mob-vista')">Vista jardinero</button>
+        <button class="stab" onclick="swSub(this,'mob-envio')">Envío individual</button>
+        <button class="stab" onclick="swSub(this,'mob-masivo')">Envío masivo</button>
+        <button class="stab" onclick="swSub(this,'mob-reg')">Registro de campo</button>
+      </div>
+
+      <div id="mob-vista">
+        <div class="grid-2" style="margin-bottom:14px">
+          <div class="form-row"><label class="form-label">Jardinero</label><select id="mv-jard" onchange="renderMobVista()"><option value="">— Seleccionar —</option></select></div>
+          <div class="form-row"><label class="form-label">Fecha</label><input type="date" id="mv-fecha" onchange="renderMobVista()"></div>
+        </div>
+        <div style="display:flex;justify-content:center">
+          <div id="mv-phone"></div>
+        </div>
+      </div>
+
+      <div id="mob-envio" style="display:none">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-send"></i>Generar mensaje</div>
+            <div class="form-row"><label class="form-label">Jardinero</label><select id="env-jard" onchange="generarMsg()"><option value="">— Seleccionar —</option></select></div>
+            <div class="form-row"><label class="form-label">Fecha</label><input type="date" id="env-fecha" onchange="generarMsg()"></div>
+            <div class="form-row"><label class="form-label">Saludo personalizado (opcional)</label><textarea id="env-intro" placeholder="Buenos días Carlos! Aquí tu jornada..." onkeyup="generarMsg()"></textarea></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+              <button class="btn btn-sm btn-wa" onclick="abrirWA()"><i class="ti ti-brand-whatsapp"></i> WhatsApp</button>
+              <button class="btn btn-sm btn-sms" onclick="abrirSMS()"><i class="ti ti-message"></i> SMS</button>
+              <button class="btn btn-sm" onclick="copiarMsg()"><i class="ti ti-copy"></i> Copiar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="slbl">Vista previa del mensaje</div>
+            <div class="msg-preview" id="msg-prev">Selecciona jardinero y fecha...</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="mob-masivo" style="display:none">
+        <div class="card">
+          <div class="card-title"><i class="ti ti-send"></i>Envío masivo — toda la cuadrilla</div>
+          <div class="form-row" style="max-width:260px"><label class="form-label">Fecha de jornada</label><input type="date" id="mas-fecha" onchange="renderMasivo()"></div>
+          <div id="masivo-lista"></div>
+          <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="envioMasivo()"><i class="ti ti-send"></i> Enviar a todos vía WhatsApp</button>
+        </div>
+      </div>
+
+      <div id="mob-reg" style="display:none">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-device-floppy"></i>Registro de campo</div>
+            <div class="form-row"><label class="form-label">Jardinero</label><select id="reg-jard" onchange="syncRegTareas()"><option value="">— Seleccionar —</option></select></div>
+            <div class="form-row"><label class="form-label">Fecha</label><input type="date" id="reg-fecha" onchange="syncRegTareas()"></div>
+            <div class="form-row"><label class="form-label">Tarea</label><select id="reg-tarea"><option value="">— Seleccionar —</option></select></div>
+            <div class="form-row"><label class="form-label">Estado</label>
+              <select id="reg-estado">
+                <option value="completado">✅ Completado</option>
+                <option value="en_progreso">🔄 En progreso</option>
+                <option value="no_realizado">❌ No realizado</option>
+                <option value="con_incidencia">⚠️ Con incidencia</option>
+              </select>
+            </div>
+            <div class="form-row"><label class="form-label">Observación de campo</label><textarea id="reg-obs" placeholder="Describe el trabajo, materiales, condiciones observadas..."></textarea></div>
+            <div class="form-row"><label class="form-label">Tiempo invertido (min)</label><input type="number" id="reg-tiempo" placeholder="Ej: 90" min="0"></div>
+            <button class="btn btn-primary btn-sm" onclick="registrarCampo()"><i class="ti ti-device-floppy"></i> Registrar</button>
+          </div>
+          <div class="card">
+            <div class="card-title"><i class="ti ti-clock"></i>Registros recientes</div>
+            <div id="reg-recientes"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ HISTORIAL ══════════ -->
+    <div id="panel-historial" class="panel">
+      <div class="grid-4" style="margin-bottom:14px">
+        <div class="form-row"><label class="form-label">Jardinero</label><select id="h-jard" onchange="renderHist()"><option value="">Todos</option></select></div>
+        <div class="form-row"><label class="form-label">Zona</label><select id="h-zona" onchange="renderHist()"><option value="">Todas</option></select></div>
+        <div class="form-row"><label class="form-label">Desde</label><input type="date" id="h-desde" onchange="renderHist()"></div>
+        <div class="form-row"><label class="form-label">Hasta</label><input type="date" id="h-hasta" onchange="renderHist()"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" onclick="exportCSV()"><i class="ti ti-download"></i> Exportar CSV completo</button>
+        <button class="btn btn-sm" onclick="exportCSVFiltrado()"><i class="ti ti-filter"></i> Exportar filtrado</button>
+      </div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-title"><i class="ti ti-chart-line"></i>Tendencia (labores completadas)</div>
+          <div class="chart-wrap" style="height:160px"><canvas id="chart-hist-trend"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-clock"></i>Horas registradas por zona</div>
+          <div class="chart-wrap" style="height:160px"><canvas id="chart-hist-hrs"></canvas></div>
+        </div>
+      </div>
+      <div class="slbl">Registro día a día</div>
+      <div id="hist-lista"></div>
+    </div>
+
+    <!-- ══════════ REPORTE ══════════ -->
+    <div id="panel-reporte" class="panel">
+      <div class="grid-4" id="rep-kpis"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><i class="ti ti-users"></i>Rendimiento por jardinero</div>
+          <div id="rep-personal"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-map-pin"></i>Avance acumulado por zona</div>
+          <div id="rep-zonas"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title"><i class="ti ti-table"></i>Registro completo de labores</div>
+        <div style="overflow-x:auto">
+          <table class="rep-table" id="rep-tabla"></table>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-sm" onclick="exportCSV()"><i class="ti ti-download"></i> Exportar CSV</button>
+        <button class="btn btn-sm btn-primary" onclick="imprimirReporte()"><i class="ti ti-printer"></i> Imprimir reporte</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<script>
+// ── DATA ──────────────────────────────────────────────
+const AC=[
+  {bg:'#EAF3DE',tc:'#27500A'},{bg:'#E1F5EE',tc:'#085041'},
+  {bg:'#E6F1FB',tc:'#0C447C'},{bg:'#FAEEDA',tc:'#633806'},
+  {bg:'#EEEDFE',tc:'#3C3489'},{bg:'#FCEBEB',tc:'#791F1F'},
+  {bg:'#FBEAF0',tc:'#72243E'},{bg:'#F1EFE8',tc:'#444441'}
+];
+let tareas=[], personal=[], registros=[], filtroA='todos';
+let chartTrend=null, chartEstado=null, chartTipos=null, chartPers=null, chartHistTrend=null, chartHistHrs=null;
+const ZONAS_DEF = [
+  {name:'Jardín de rosales', cls:'z-green', x:'10%',y:'8%',  w:130,h:100},
+  {name:'Arboretum',          cls:'z-green', x:'42%',y:'4%',  w:160,h:120},
+  {name:'Pradera principal',  cls:'z-green', x:'70%',y:'15%', w:170,h:130},
+  {name:'Setos y borduras',   cls:'z-earth', x:'5%', y:'45%', w:100,h:80},
+  {name:'Estanque y zona húmeda', cls:'z-blue', x:'32%',y:'50%', w:130,h:100},
+  {name:'Invernadero patrimonial',cls:'z-warn',x:'60%',y:'52%', w:130,h:90},
+  {name:'Caminos y accesos',  cls:'z-gray2', x:'15%',y:'72%', w:200,h:60},
+  {name:'Zona de compost',    cls:'z-earth', x:'68%',y:'72%', w:100,h:80},
+  {name:'Pérgolas y estructuras',cls:'z-teal',x:'20%',y:'30%', w:120,h:70},
+];
+
+// ── UTILS ─────────────────────────────────────────────
+function today(){return new Date().toISOString().split('T')[0]}
+function fmt(d){if(!d)return'';const[y,m,dd]=d.split('-');const ms=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return`${dd} ${ms[+m-1]} ${y}`}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function getP(id){return personal.find(x=>x.id===id)}
+function pBadge(p){const m={Alta:'b-red',Media:'b-amber',Baja:'b-green'};return`<span class="badge ${m[p]||'b-gray'}">${p}</span>`}
+function eBadge(e){const m={completado:'b-green',en_progreso:'b-blue',no_realizado:'b-red',con_incidencia:'b-amber'};const l={completado:'Completado',en_progreso:'En progreso',no_realizado:'No realizado',con_incidencia:'Incidencia'};return`<span class="badge ${m[e]||'b-gray'}">${l[e]||e}</span>`}
+function avBadge(n){const c=AC[personal.findIndex(x=>x.nombre===n)%AC.length]||AC[0];return`<span class="avatar" style="background:${c.bg};color:${c.tc}">${n.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase()}</span>`}
+
+// ── INIT ──────────────────────────────────────────────
+function init(){
+  const h=new Date();
+  const dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  document.getElementById('today-label').textContent=`${dias[h.getDay()]} ${h.getDate()} de ${meses[h.getMonth()]} ${h.getFullYear()}`;
+  ['f-fecha','mv-fecha','env-fecha','reg-fecha','mas-fecha'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=today()});
+  loadDemoData();
+  syncSelects(); renderAll();
+}
+
+// ── DEMO DATA ─────────────────────────────────────────
+function loadDemoData(){
+  personal=[
+    {id:'p1',nombre:'Carlos Mendoza',especialidad:'Podador especialista',tel:'+56912345678',zona:'Jardín de rosales'},
+    {id:'p2',nombre:'Ana Rojas',      especialidad:'Fitosanitario',       tel:'+56987654321',zona:'Arboretum'},
+    {id:'p3',nombre:'Luis Pérez',     especialidad:'Jardinero general',   tel:'+56911223344',zona:'Pradera principal'},
+    {id:'p4',nombre:'María González', especialidad:'Horticultor',         tel:'+56944556677',zona:'Invernadero patrimonial'},
+  ];
+  const h=today();
+  function daysAgo(n){const d=new Date();d.setDate(d.getDate()-n);return d.toISOString().split('T')[0]}
+  tareas=[
+    {id:'t1', fecha:h,          turno:'Mañana (07:00–12:00)',   zona:'Jardín de rosales',        labor:'Poda de mantenimiento',     jardinero:'p1',prioridad:'Alta',  obs:'Usar tijeras desinfectadas. Retirar ramas cruzadas y secas.',done:false},
+    {id:'t2', fecha:h,          turno:'Mañana (07:00–12:00)',   zona:'Arboretum',                labor:'Inspección fitosanitaria',   jardinero:'p2',prioridad:'Alta',  obs:'Revisar Quercus robur sector norte por signos de antracnosis.',done:false},
+    {id:'t3', fecha:h,          turno:'Tarde (13:00–18:00)',    zona:'Pradera principal',         labor:'Control de malezas',         jardinero:'p3',prioridad:'Media', obs:'',done:true},
+    {id:'t4', fecha:h,          turno:'Tarde (13:00–18:00)',    zona:'Estanque y zona húmeda',   labor:'Limpieza y recolección',    jardinero:'p4',prioridad:'Media', obs:'Retirar vegetación flotante excesiva.',done:false},
+    {id:'t5', fecha:h,          turno:'Jornada completa',       zona:'Setos y borduras',         labor:'Poda formativa',             jardinero:'p1',prioridad:'Baja',  obs:'',done:false},
+    {id:'t6', fecha:daysAgo(1), turno:'Mañana (07:00–12:00)',  zona:'Invernadero patrimonial',  labor:'Fertilización foliar',       jardinero:'p2',prioridad:'Media', obs:'NPK 20-20-20 al 0.2%',done:true},
+    {id:'t7', fecha:daysAgo(1), turno:'Tarde (13:00–18:00)',   zona:'Caminos y accesos',        labor:'Limpieza y recolección',    jardinero:'p3',prioridad:'Baja',  obs:'',done:true},
+    {id:'t8', fecha:daysAgo(1), turno:'Mañana (07:00–12:00)',  zona:'Jardín de rosales',        labor:'Riego manual',               jardinero:'p4',prioridad:'Media', obs:'',done:true},
+    {id:'t9', fecha:daysAgo(2), turno:'Mañana (07:00–12:00)',  zona:'Arboretum',                labor:'Aplicación de mulch',        jardinero:'p1',prioridad:'Media', obs:'Corteza de pino 5 cm',done:true},
+    {id:'t10',fecha:daysAgo(2), turno:'Tarde (13:00–18:00)',   zona:'Pérgolas y estructuras',   labor:'Reparación de estructuras',  jardinero:'p3',prioridad:'Alta',  obs:'Revisar tensores pérgola principal.',done:true},
+    {id:'t11',fecha:daysAgo(5), turno:'Jornada completa',      zona:'Pradera principal',         labor:'Siembra directa',            jardinero:'p4',prioridad:'Media', obs:'Festuca arundinacea sector sur.',done:true},
+    {id:'t12',fecha:daysAgo(5), turno:'Mañana (07:00–12:00)', zona:'Zona de compost',           labor:'Escarificación de suelo',    jardinero:'p3',prioridad:'Baja',  obs:'',done:true},
+    {id:'t13',fecha:daysAgo(7), turno:'Mañana (07:00–12:00)', zona:'Jardín de rosales',         labor:'Tratamiento fitosanitario',  jardinero:'p2',prioridad:'Alta',  obs:'Fungicida cúprico. EPI obligatorio.',done:true},
+    {id:'t14',fecha:daysAgo(7), turno:'Tarde (13:00–18:00)',  zona:'Arboretum',                 labor:'Inventario de especies',     jardinero:'p4',prioridad:'Baja',  obs:'',done:true},
+    {id:'t15',fecha:daysAgo(10),turno:'Mañana (07:00–12:00)', zona:'Pradera principal',         labor:'Fertilización edáfica',      jardinero:'p1',prioridad:'Media', obs:'',done:true},
+  ];
+  registros=[
+    {id:'r1',tareaId:'t3', jardineroId:'p3',jardineroNombre:'Luis Pérez',   fecha:h,          zona:'Pradera principal',       labor:'Control de malezas',        estado:'completado',     obs:'Cardo y poa annua removidos. ~80% del área.',tiempo:180,ts:Date.now()-3600000},
+    {id:'r2',tareaId:'t6', jardineroId:'p2',jardineroNombre:'Ana Rojas',    fecha:daysAgo(1), zona:'Invernadero patrimonial', labor:'Fertilización foliar',       estado:'completado',     obs:'Aplicación uniforme. Clorosis en Ficus lyrata, posible déficit de Fe.',tiempo:90,ts:Date.now()-90000000},
+    {id:'r3',tareaId:'t7', jardineroId:'p3',jardineroNombre:'Luis Pérez',   fecha:daysAgo(1), zona:'Caminos y accesos',       labor:'Limpieza y recolección',    estado:'completado',     obs:'Caminos despejados. Residuos a zona de compost.',tiempo:120,ts:Date.now()-86400000},
+    {id:'r4',tareaId:'t10',jardineroId:'p3',jardineroNombre:'Luis Pérez',   fecha:daysAgo(2), zona:'Pérgolas y estructuras',  labor:'Reparación de estructuras', estado:'con_incidencia', obs:'Tensor N°3 requiere reemplazo urgente. Se solicitó presupuesto.',tiempo:150,ts:Date.now()-172800000},
+    {id:'r5',tareaId:'t13',jardineroId:'p2',jardineroNombre:'Ana Rojas',    fecha:daysAgo(7), zona:'Jardín de rosales',       labor:'Tratamiento fitosanitario', estado:'completado',     obs:'Aplicación exitosa. Se detectó mancha negra en 3 rosales sector A.',tiempo:200,ts:Date.now()-604800000},
+  ];
+}
+
+// ── SYNC SELECTS ──────────────────────────────────────
+function syncSelects(){
+  const ids=['f-jard','mv-jard','env-jard','reg-jard','h-jard'];
+  ids.forEach(id=>{
+    const s=document.getElementById(id);if(!s)return;
+    const v=s.value;
+    const pre=id==='h-jard'?'<option value="">Todos</option>':'<option value="">— Seleccionar —</option>';
+    s.innerHTML=pre+personal.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
+    s.value=v;
+  });
+  const hz=document.getElementById('h-zona');
+  if(hz){const zonas=[...new Set(tareas.map(t=>t.zona))];hz.innerHTML='<option value="">Todas</option>'+zonas.map(z=>`<option>${z}</option>`).join('')}
+  syncRegTareas();
+}
+
+function syncRegTareas(){
+  const jid=document.getElementById('reg-jard')?.value;
+  const fecha=document.getElementById('reg-fecha')?.value;
+  const s=document.getElementById('reg-tarea');if(!s)return;
+  const mis=tareas.filter(t=>(!jid||t.jardinero===jid)&&(!fecha||t.fecha===fecha));
+  s.innerHTML='<option value="">— Seleccionar —</option>'+mis.map(t=>`<option value="${t.id}">${t.labor} — ${t.zona}</option>`).join('');
+}
+
+// ── RENDER ALL ────────────────────────────────────────
+function renderAll(){
+  renderKPIs(); renderDash(); renderZonasProg(); renderTareas();
+  renderPersonal(); renderMapa(); renderHist(); renderReporte();
+  renderRegRecientes(); renderMobVista(); generarMsg(); renderMasivo();
+  drawChartTrend(); drawChartEstado(); drawChartTipos(); drawChartPersonal();
+}
+
+// ── NAVIGATION ────────────────────────────────────────
+function sw(name, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(s=>s.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  const titles={dash:'Dashboard',programar:'Programar labores',labores:'Labores del día',mapa:'Mapa de zonas',personal:'Personal',movil:'Envío móvil',historial:'Historial',reporte:'Reportes'};
+  document.getElementById('page-title').textContent=titles[name]||name;
+  if(name==='reporte') renderReporte();
+  if(name==='historial'){renderHist();drawChartHistTrend();drawChartHistHrs();}
+  if(name==='mapa') renderMapa();
+  if(name==='dash'){renderKPIs();renderDash();drawChartTrend();drawChartEstado();}
+  if(name==='personal') drawChartPersonal();
+}
+function swSub(el,id){
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
+  ['mob-vista','mob-envio','mob-masivo','mob-reg'].forEach(s=>document.getElementById(s).style.display='none');
+  document.getElementById(id).style.display='block';
+  if(id==='mob-envio') generarMsg();
+  if(id==='mob-masivo') renderMasivo();
+  if(id==='mob-reg'){syncRegTareas();renderRegRecientes();}
+}
+
+// ── TASKS ─────────────────────────────────────────────
+function addTask(){
+  const fecha=document.getElementById('f-fecha').value;
+  const turno=document.getElementById('f-turno').value;
+  const zona=document.getElementById('f-zona').value;
+  const labor=document.getElementById('f-labor').value;
+  const jardinero=document.getElementById('f-jard').value;
+  const prioridad=document.getElementById('f-prior').value;
+  const obs=document.getElementById('f-obs').value.trim();
+  if(!fecha||!zona||!labor)return;
+  tareas.push({id:uid(),fecha,turno,zona,labor,jardinero,prioridad,obs,done:false});
+  clearF(); syncSelects(); renderAll();
+}
+function clearF(){
+  document.getElementById('f-fecha').value=today();
+  document.getElementById('f-obs').value='';
+  document.getElementById('f-prior').value='Media';
+  document.getElementById('f-jard').value='';
+}
+function toggleDone(id){
+  const t=tareas.find(x=>x.id===id);if(!t)return;
+  t.done=!t.done;
+  if(t.done&&!registros.find(r=>r.tareaId===id)){
+    const p=getP(t.jardinero);
+    registros.push({id:uid(),tareaId:id,jardineroId:t.jardinero,jardineroNombre:p?p.nombre:'Sin asignar',fecha:t.fecha,zona:t.zona,labor:t.labor,estado:'completado',obs:'Marcado por supervisor',tiempo:null,ts:Date.now()});
+  }
+  renderAll();
+}
+function elimTask(id){if(!confirm('¿Eliminar esta tarea?'))return;tareas=tareas.filter(x=>x.id!==id);renderAll();}
+function setF(f,el){filtroA=f;document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderTareas();}
+
+function renderTareas(){
+  const el=document.getElementById('lista-tareas');
+  const ff=document.getElementById('f-filtro-fecha').value;
+  let lista=tareas;
+  if(ff) lista=lista.filter(t=>t.fecha===ff);
+  if(filtroA==='pendiente') lista=lista.filter(t=>!t.done);
+  else if(filtroA==='completado') lista=lista.filter(t=>t.done);
+  else if(filtroA==='Alta') lista=lista.filter(t=>t.prioridad==='Alta');
+  else if(filtroA==='incidencia') lista=lista.filter(t=>{const r=registros.find(x=>x.tareaId===t.id);return r&&r.estado==='con_incidencia';});
+  if(!lista.length){el.innerHTML='<div class="empty"><i class="ti ti-plant-2"></i>Sin labores para mostrar.</div>';return}
+  const sorted=[...lista].sort((a,b)=>({Alta:0,Media:1,Baja:2}[a.prioridad]||1)-({Alta:0,Media:1,Baja:2}[b.prioridad]||1));
+  el.innerHTML=sorted.map(t=>{
+    const p=getP(t.jardinero);
+    const r=registros.find(x=>x.tareaId===t.id);
+    return`<div class="task-item">
+      <div class="task-check ${t.done?'done':''}" onclick="toggleDone('${t.id}')" title="${t.done?'Marcar pendiente':'Marcar completada'}">${t.done?'<i class="ti ti-check" style="font-size:11px"></i>':''}</div>
+      <div style="flex:1">
+        <div class="task-name ${t.done?'done':''}">${t.labor}</div>
+        <div class="task-meta">
+          <span><i class="ti ti-map-pin"></i> ${t.zona}</span>
+          <span><i class="ti ti-calendar"></i> ${fmt(t.fecha)}</span>
+          <span><i class="ti ti-clock"></i> ${t.turno}</span>
+          <span><i class="ti ti-user"></i> ${p?p.nombre:'Sin asignar'}</span>
+        </div>
+        <div class="task-meta" style="margin-top:5px;gap:5px">${pBadge(t.prioridad)}</div>
+        ${t.obs?`<div class="task-obs">${t.obs}</div>`:''}
+        ${r&&r.obs&&r.obs!=='Marcado por supervisor'?`<div class="task-report"><i class="ti ti-device-mobile"></i> ${r.jardineroNombre}: ${r.obs}${r.tiempo?` · ${r.tiempo} min`:''} ${eBadge(r.estado)}</div>`:''}
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="elimTask('${t.id}')" title="Eliminar"><i class="ti ti-trash"></i></button>
+    </div>`;
+  }).join('');
+}
+
+// ── ZONAS PROG ────────────────────────────────────────
+function renderZonasProg(){
+  const el=document.getElementById('zonas-prog');if(!el)return;
+  const h=today(); const hT=tareas.filter(t=>t.fecha===h);
+  const zonas=[...new Set(hT.map(t=>t.zona))];
+  if(!zonas.length){el.innerHTML='<div class="empty" style="padding:1rem"><i class="ti ti-info-circle"></i>Sin zonas programadas para hoy.</div>';return}
+  el.innerHTML=zonas.map(z=>{
+    const tz=hT.filter(t=>t.zona===z);const c=tz.filter(t=>t.done).length;const pct=Math.round((c/tz.length)*100);
+    const cls=pct===100?'':'pct<50?warn:';
+    return`<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="font-weight:500">${z}</span><span style="color:#6b6b66">${c}/${tz.length} · ${pct}%</span>
+      </div>
+      <div class="pbar"><div class="pbar-fill ${pct<50?'danger':pct<80?'warn':''}" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ── KPIs ──────────────────────────────────────────────
+function renderKPIs(){
+  const h=today();const hT=tareas.filter(t=>t.fecha===h);
+  const comp=hT.filter(t=>t.done).length;const pend=hT.filter(t=>!t.done).length;
+  const inc=registros.filter(r=>r.estado==='con_incidencia').length;
+  const hrs=Math.round(registros.reduce((a,r)=>a+(r.tiempo||0),0)/60);
+  const el=document.getElementById('kpis');if(!el)return;
+  el.innerHTML=`
+    <div class="kpi green"><i class="ti ti-checklist kpi-icon"></i><div class="kpi-val">${comp}</div><div class="kpi-label">Completadas hoy</div><div class="kpi-delta up"><i class="ti ti-arrow-up"></i> ${hT.length} programadas</div></div>
+    <div class="kpi earth"><i class="ti ti-clock kpi-icon"></i><div class="kpi-val">${pend}</div><div class="kpi-label">Pendientes hoy</div><div class="kpi-delta ${pend>3?'down':'up'}">${hT.length?Math.round((comp/hT.length)*100):0}% completado</div></div>
+    <div class="kpi blue"><i class="ti ti-hourglass kpi-icon"></i><div class="kpi-val">${hrs}h</div><div class="kpi-label">Horas registradas</div><div class="kpi-delta up">${registros.length} reportes de campo</div></div>
+    <div class="kpi red"><i class="ti ti-alert-triangle kpi-icon"></i><div class="kpi-val">${inc}</div><div class="kpi-label">Incidencias activas</div><div class="kpi-delta ${inc>0?'down':'up'}">${inc>0?'Requiere atención':'Sin incidencias'}</div></div>`;
+}
+
+// ── DASHBOARD ─────────────────────────────────────────
+function renderDash(){
+  const h=today();const hT=tareas.filter(t=>t.fecha===h&&t.prioridad==='Alta'&&!t.done);
+  const elU=document.getElementById('dash-urgentes');
+  if(elU){
+    if(!hT.length){elU.innerHTML='<div class="empty" style="padding:1rem"><i class="ti ti-circle-check"></i>Sin tareas urgentes pendientes.</div>'}
+    else{elU.innerHTML=hT.map(t=>{const p=getP(t.jardinero);return`<div class="task-item"><div class="task-check ${t.done?'done':''}" onclick="toggleDone('${t.id}')">${t.done?'<i class="ti ti-check" style="font-size:11px"></i>':''}</div><div style="flex:1"><div class="task-name">${t.labor}</div><div class="task-meta"><span><i class="ti ti-map-pin"></i> ${t.zona}</span><span><i class="ti ti-user"></i> ${p?p.nombre:'Sin asignar'}</span></div></div>${pBadge(t.prioridad)}</div>`}).join('')}
+  }
+  const elE=document.getElementById('dash-equipo');
+  if(elE&&personal.length){
+    elE.innerHTML=personal.map(p=>{
+      const ci=AC[personal.indexOf(p)%AC.length];
+      const mis=tareas.filter(t=>t.jardinero===p.id);const c=mis.filter(t=>t.done).length;const pct=mis.length?Math.round((c/mis.length)*100):0;
+      return`<div class="wrow"><div class="avatar" style="background:${ci.bg};color:${ci.tc}">${p.nombre.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase()}</div><div style="flex:1"><div class="wname">${p.nombre}</div><div class="wmeta">${mis.length} labores · ${c} completadas</div><div class="pbar" style="margin-top:4px"><div class="pbar-fill ${pct<50?'danger':pct<80?'warn':''}" style="width:${pct}%"></div></div></div><span class="badge ${pct>=80?'b-green':pct>=50?'b-amber':'b-red'}" style="margin-left:8px">${pct}%</span></div>`;
+    }).join('')
+  } else if(elE) elE.innerHTML='<div class="empty" style="padding:1rem"><i class="ti ti-users"></i>Sin personal registrado.</div>';
+
+  const elI=document.getElementById('dash-incidencias');
+  if(elI){
+    const incs=registros.filter(r=>r.estado==='con_incidencia').slice(0,4);
+    if(!incs.length){elI.innerHTML='<div class="empty" style="padding:1rem"><i class="ti ti-circle-check"></i>Sin incidencias registradas.</div>'}
+    else{elI.innerHTML=incs.map(r=>`<div class="wrow"><i class="ti ti-alert-triangle" style="color:#d68910;font-size:18px;flex-shrink:0"></i><div style="flex:1"><div class="wname">${r.labor} — ${r.zona}</div><div class="wmeta"><i class="ti ti-user"></i> ${r.jardineroNombre} · <i class="ti ti-calendar"></i> ${fmt(r.fecha)}</div>${r.obs?`<div style="font-size:11px;color:#6b6b66;margin-top:3px">${r.obs}</div>`:''}</div>${eBadge(r.estado)}</div>`).join('')}
+  }
+}
+
+// ── MAPA ──────────────────────────────────────────────
+function renderMapa(){
+  const el=document.getElementById('zone-map');if(!el)return;
+  el.innerHTML='';
+  ZONAS_DEF.forEach(z=>{
+    const zt=tareas.filter(t=>t.zona===z.name);const comp=zt.filter(t=>t.done).length;
+    const pct=zt.length?Math.round((comp/zt.length)*100):null;
+    let cls=z.cls;
+    if(pct!==null){cls=pct>=80?'z-green':pct>=40?'z-warn':'z-red';}
+    if(z.name==='Estanque y zona húmeda') cls='z-blue';
+    const div=document.createElement('div');
+    div.className=`zone-blob ${cls}`;
+    div.style.cssText=`left:${z.x};top:${z.y};width:${z.w}px;height:${z.h}px;`;
+    div.innerHTML=`<div style="padding:6px;text-align:center"><div style="font-size:10px;font-weight:600;line-height:1.2">${z.name}</div>${pct!==null?`<div style="font-size:11px;margin-top:2px">${pct}%</div>`:''}<div class="zone-tooltip">${z.name}${zt.length?` · ${comp}/${zt.length} tareas`:' · Sin tareas'}</div></div>`;
+    div.onclick=()=>showZonaDetalle(z.name);
+    el.appendChild(div);
+  });
+  renderZonasResumenMapa();
+}
+function showZonaDetalle(zona){
+  const el=document.getElementById('zona-detalle');if(!el)return;
+  const zt=tareas.filter(t=>t.zona===zona);const comp=zt.filter(t=>t.done).length;const pct=zt.length?Math.round((comp/zt.length)*100):0;
+  const recs=registros.filter(r=>r.zona===zona);
+  el.innerHTML=`<div style="font-size:15px;font-weight:600;color:#1a3d0e;margin-bottom:8px">${zona}</div>
+    <div class="grid-2" style="gap:8px;margin-bottom:10px">
+      <div style="text-align:center;background:#f2f9e6;border-radius:8px;padding:10px"><div style="font-size:20px;font-weight:600;color:#27500a">${zt.length}</div><div style="font-size:11px;color:#6b6b66">labores totales</div></div>
+      <div style="text-align:center;background:#f2f9e6;border-radius:8px;padding:10px"><div style="font-size:20px;font-weight:600;color:#27500a">${pct}%</div><div style="font-size:11px;color:#6b6b66">completado</div></div>
+    </div>
+    <div class="pbar" style="margin-bottom:12px"><div class="pbar-fill ${pct<50?'danger':pct<80?'warn':''}" style="width:${pct}%"></div></div>
+    ${zt.length?zt.slice(0,4).map(t=>`<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid #f5f5f2;font-size:12px"><i class="ti ti-${t.done?'circle-check':'circle'}" style="color:${t.done?'#639922':'#b0b0aa'};margin-top:1px"></i><div style="flex:1">${t.labor}<span style="color:#6b6b66;margin-left:6px">${fmt(t.fecha)}</span></div>${pBadge(t.prioridad)}</div>`).join(''):'<div style="font-size:12px;color:#6b6b66">Sin tareas asignadas.</div>'}
+    ${recs.filter(r=>r.estado==='con_incidencia').length?`<div style="margin-top:10px;padding:8px;background:#fef9ec;border-radius:6px;font-size:12px;color:#d68910"><i class="ti ti-alert-triangle"></i> ${recs.filter(r=>r.estado==='con_incidencia').length} incidencia(s) registrada(s) en esta zona.</div>`:''}`;
+}
+function renderZonasResumenMapa(){
+  const el=document.getElementById('zonas-resumen-mapa');if(!el)return;
+  const zonas=ZONAS_DEF.map(z=>z.name);
+  el.innerHTML=zonas.map(z=>{
+    const zt=tareas.filter(t=>t.zona===z);const comp=zt.filter(t=>t.done).length;const pct=zt.length?Math.round((comp/zt.length)*100):null;
+    return`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f2;font-size:12px">
+      <div style="width:8px;height:8px;border-radius:50%;background:${pct===null?'#b0b0aa':pct>=80?'#639922':pct>=40?'#d68910':'#c0392b'};flex-shrink:0"></div>
+      <span style="flex:1">${z}</span>
+      <span style="color:#6b6b66">${zt.length?`${comp}/${zt.length}`:'—'}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── PERSONAL ──────────────────────────────────────────
+function addPersonal(){
+  const nombre=document.getElementById('p-nombre').value.trim();
+  const esp=document.getElementById('p-esp').value;
+  const tel=document.getElementById('p-tel').value.trim();
+  const zona=document.getElementById('p-zona').value;
+  if(!nombre)return;
+  const ci=AC[personal.length%AC.length];
+  personal.push({id:uid(),nombre,especialidad:esp,tel,zona});
+  document.getElementById('p-nombre').value='';document.getElementById('p-tel').value='';
+  syncSelects();renderPersonal();drawChartPersonal();
+}
+function elimPersonal(id){if(!confirm('¿Eliminar jardinero?'))return;personal=personal.filter(x=>x.id!==id);syncSelects();renderPersonal();drawChartPersonal();}
+function renderPersonal(){
+  const el=document.getElementById('lista-personal');if(!el)return;
+  if(!personal.length){el.innerHTML='<div class="empty"><i class="ti ti-users"></i>Sin personal registrado.</div>';return}
+  el.innerHTML=personal.map(p=>{
+    const ci=AC[personal.indexOf(p)%AC.length];
+    const mis=tareas.filter(t=>t.jardinero===p.id);const c=mis.filter(t=>t.done).length;
+    return`<div class="wrow">
+      <div class="avatar" style="background:${ci.bg};color:${ci.tc}">${p.nombre.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase()}</div>
+      <div style="flex:1"><div class="wname">${p.nombre}</div><div class="wmeta">${p.especialidad} · ${p.tel||'Sin teléfono'}</div><div class="wmeta"><i class="ti ti-map-pin"></i> ${p.zona}</div></div>
+      <div style="text-align:right;min-width:60px"><div style="font-size:12px;font-weight:600;color:#27500a">${mis.length?Math.round((c/mis.length)*100):0}%</div><div style="font-size:10px;color:#6b6b66">${c}/${mis.length}</div></div>
+      <button class="btn btn-sm btn-danger" onclick="elimPersonal('${p.id}')"><i class="ti ti-trash"></i></button>
+    </div>`;
+  }).join('');
+}
+
+// ── MOBILE ────────────────────────────────────────────
+function renderMobVista(){
+  const jid=document.getElementById('mv-jard')?.value;
+  const fecha=document.getElementById('mv-fecha')?.value;
+  const el=document.getElementById('mv-phone');if(!el)return;
+  if(!jid){el.innerHTML='<div class="empty"><i class="ti ti-device-mobile"></i>Selecciona un jardinero.</div>';return}
+  const p=getP(jid);const mis=tareas.filter(t=>t.jardinero===jid&&(!fecha||t.fecha===fecha));
+  if(!mis.length){el.innerHTML='<div class="empty"><i class="ti ti-calendar-off"></i>Sin tareas asignadas para esta fecha.</div>';return}
+  el.innerHTML=`<div class="phone-frame">
+    <div class="phone-bar"><i class="ti ti-plant" style="color:#c0dd97;font-size:18px"></i><div><div class="phone-bar-title">${p.nombre}</div><div class="phone-bar-sub">Jornada ${fmt(fecha)}</div></div></div>
+    ${mis.map((t,i)=>{const r=registros.find(x=>x.tareaId===t.id);return`<div class="phone-task">
+      <div class="task-check ${t.done?'done':''}" style="width:18px;height:18px" onclick="toggleDone('${t.id}')">${t.done?'<i class="ti ti-check" style="font-size:10px"></i>':''}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500">${i+1}. ${t.labor}</div>
+        <div style="font-size:11px;color:#6b6b66;margin-top:2px"><i class="ti ti-map-pin"></i> ${t.zona} &nbsp; ${pBadge(t.prioridad)}</div>
+        ${t.obs?`<div style="font-size:11px;margin-top:4px;padding:4px 8px;background:#f5f5f2;border-radius:4px;border-left:2px solid #97c459">${t.obs}</div>`:''}
+        ${r?`<div style="font-size:11px;color:#27500a;margin-top:3px"><i class="ti ti-check"></i> Reportado${r.tiempo?` · ${r.tiempo}min`:''}</div>`:''}
+      </div></div>`;}).join('')}
+  </div>`;
+}
+function generarMsg(){
+  const jid=document.getElementById('env-jard')?.value;
+  const fecha=document.getElementById('env-fecha')?.value;
+  const intro=document.getElementById('env-intro')?.value.trim();
+  const el=document.getElementById('msg-prev');if(!el)return;
+  if(!jid||!fecha){el.textContent='Selecciona jardinero y fecha.';return}
+  const p=getP(jid);const mis=tareas.filter(t=>t.jardinero===jid&&t.fecha===fecha);
+  if(!mis.length){el.textContent=`Sin tareas para ${p.nombre} el ${fmt(fecha)}.`;return}
+  const cab=intro||`Hola ${p.nombre}! 👋\nAquí tu jornada del ${fmt(fecha)}:`;
+  const lineas=mis.map((t,i)=>`${i+1}. [${t.prioridad.toUpperCase()}] ${t.labor}\n   📍 ${t.zona}\n   ⏰ ${t.turno}${t.obs?'\n   📋 '+t.obs:''}`).join('\n\n');
+  el.textContent=`${cab}\n\n${lineas}\n\n📊 Total: ${mis.length} tarea${mis.length!==1?'s':''}.\nMarca cada una al completarla. Ante cualquier incidencia informa al supervisor. 🌿`;
+}
+function getMsgText(){return document.getElementById('msg-prev')?.textContent||''}
+function abrirWA(){const jid=document.getElementById('env-jard')?.value;const p=getP(jid);const phone=p?.tel?.replace(/\D/g,'')||'';const url=phone?`https://wa.me/${phone}?text=${encodeURIComponent(getMsgText())}`:`https://wa.me/?text=${encodeURIComponent(getMsgText())}`;window.open(url,'_blank');}
+function abrirSMS(){const jid=document.getElementById('env-jard')?.value;const p=getP(jid);const phone=p?.tel?.replace(/\D/g,'')||'';window.open(`sms:${phone}?body=${encodeURIComponent(getMsgText())}`,'_blank');}
+function copiarMsg(){navigator.clipboard?.writeText(getMsgText()).then(()=>alert('Mensaje copiado al portapapeles.'));}
+function renderMasivo(){
+  const fecha=document.getElementById('mas-fecha')?.value;
+  const el=document.getElementById('masivo-lista');if(!el)return;
+  if(!personal.length){el.innerHTML='<div class="empty"><i class="ti ti-users"></i>Sin personal.</div>';return}
+  el.innerHTML=personal.map(p=>{
+    const mis=tareas.filter(t=>t.jardinero===p.id&&(!fecha||t.fecha===fecha));
+    const ci=AC[personal.indexOf(p)%AC.length];
+    return`<div class="wrow">
+      <div class="avatar" style="background:${ci.bg};color:${ci.tc}">${p.nombre.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase()}</div>
+      <div style="flex:1"><div class="wname">${p.nombre}</div><div class="wmeta">${mis.length} tarea${mis.length!==1?'s':''} · ${p.tel||'Sin teléfono'}</div></div>
+      <button class="btn btn-sm btn-wa" onclick="enviarInd('${p.id}')"><i class="ti ti-brand-whatsapp"></i> WA</button>
+    </div>`;
+  }).join('');
+}
+function enviarInd(jid){
+  const fecha=document.getElementById('mas-fecha')?.value||today();
+  const p=getP(jid);if(!p)return;
+  const mis=tareas.filter(t=>t.jardinero===jid&&t.fecha===fecha);
+  if(!mis.length){alert(`Sin tareas para ${p.nombre} en esa fecha.`);return}
+  const msg=`Hola ${p.nombre}! 👋\nJornada del ${fmt(fecha)}:\n\n`+mis.map((t,i)=>`${i+1}. [${t.prioridad.toUpperCase()}] ${t.labor}\n   📍 ${t.zona}\n   ⏰ ${t.turno}${t.obs?'\n   📋 '+t.obs:''}`).join('\n\n')+`\n\n📊 Total: ${mis.length} tarea${mis.length!==1?'s':''}. Buen trabajo! 🌿`;
+  const phone=p.tel?.replace(/\D/g,'')||'';
+  window.open(phone?`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+}
+function envioMasivo(){const fecha=document.getElementById('mas-fecha')?.value||today();personal.forEach(p=>{const mis=tareas.filter(t=>t.jardinero===p.id&&t.fecha===fecha);if(mis.length)setTimeout(()=>enviarInd(p.id),300*personal.indexOf(p))});}
+
+// ── REGISTRO ──────────────────────────────────────────
+function registrarCampo(){
+  const jid=document.getElementById('reg-jard').value;
+  const fecha=document.getElementById('reg-fecha').value;
+  const taid=document.getElementById('reg-tarea').value;
+  const estado=document.getElementById('reg-estado').value;
+  const obs=document.getElementById('reg-obs').value.trim();
+  const tiempo=document.getElementById('reg-tiempo').value;
+  if(!jid||!taid)return;
+  const p=getP(jid);const t=tareas.find(x=>x.id===taid);if(!p||!t)return;
+  const prev=registros.find(r=>r.tareaId===taid);
+  if(prev){prev.estado=estado;prev.obs=obs||'Sin observaciones';prev.tiempo=tiempo?parseInt(tiempo):null;prev.ts=Date.now();}
+  else{registros.push({id:uid(),tareaId:taid,jardineroId:jid,jardineroNombre:p.nombre,fecha,zona:t.zona,labor:t.labor,estado,obs:obs||'Sin observaciones',tiempo:tiempo?parseInt(tiempo):null,ts:Date.now()});}
+  if(estado==='completado') t.done=true;
+  document.getElementById('reg-obs').value='';document.getElementById('reg-tiempo').value='';
+  renderAll();
+}
+function renderRegRecientes(){
+  const el=document.getElementById('reg-recientes');if(!el)return;
+  const rec=[...registros].sort((a,b)=>b.ts-a.ts).slice(0,6);
+  if(!rec.length){el.innerHTML='<div class="empty"><i class="ti ti-clock"></i>Sin registros aún.</div>';return}
+  el.innerHTML=rec.map(r=>`<div class="wrow">
+    <i class="ti ti-${r.estado==='completado'?'circle-check':r.estado==='con_incidencia'?'alert-triangle':r.estado==='en_progreso'?'refresh':'circle-x'}" style="font-size:18px;color:${r.estado==='completado'?'#639922':r.estado==='con_incidencia'?'#d68910':'#6b6b66'};flex-shrink:0"></i>
+    <div style="flex:1"><div class="wname" style="font-size:12px">${r.labor}</div><div class="wmeta"><i class="ti ti-user"></i> ${r.jardineroNombre} · <i class="ti ti-map-pin"></i> ${r.zona}</div>${r.obs&&r.obs!=='Sin observaciones'?`<div style="font-size:11px;color:#6b6b66;margin-top:2px">${r.obs}</div>`:''}</div>
+    <div style="text-align:right">${eBadge(r.estado)}${r.tiempo?`<div style="font-size:10px;color:#6b6b66;margin-top:3px">${r.tiempo} min</div>`:''}</div>
+  </div>`).join('');
+}
+
+// ── HISTORIAL ─────────────────────────────────────────
+function renderHist(){
+  const hjid=document.getElementById('h-jard')?.value;
+  const hzona=document.getElementById('h-zona')?.value;
+  const hdes=document.getElementById('h-desde')?.value;
+  const hhast=document.getElementById('h-hasta')?.value;
+  let lista=tareas;
+  if(hjid) lista=lista.filter(t=>t.jardinero===hjid);
+  if(hzona) lista=lista.filter(t=>t.zona===hzona);
+  if(hdes) lista=lista.filter(t=>t.fecha>=hdes);
+  if(hhast) lista=lista.filter(t=>t.fecha<=hhast);
+  const dias=[...new Set(lista.map(t=>t.fecha))].sort((a,b)=>b.localeCompare(a));
+  const el=document.getElementById('hist-lista');if(!el)return;
+  if(!dias.length){el.innerHTML='<div class="empty"><i class="ti ti-history"></i>Sin registros con los filtros aplicados.</div>';return}
+  el.innerHTML=dias.map(d=>{
+    const dt=lista.filter(t=>t.fecha===d);const comp=dt.filter(t=>t.done).length;const pct=Math.round((comp/dt.length)*100);
+    const rDia=registros.filter(r=>r.fecha===d&&(!hjid||r.jardineroId===hjid));
+    const hrs=Math.round(rDia.reduce((a,r)=>a+(r.tiempo||0),0)/60*10)/10;
+    return`<div class="hday">
+      <div class="hday-header" onclick="this.parentElement.classList.toggle('open')">
+        <div><div class="hday-date"><i class="ti ti-calendar" style="margin-right:6px"></i>${fmt(d)}</div>
+        <div class="hday-sub">${dt.length} labores · ${comp} completadas · ${hrs}h registradas · ${rDia.filter(r=>r.estado==='con_incidencia').length} incidencias</div></div>
+        <div style="display:flex;gap:8px;align-items:center"><span class="badge ${pct===100?'b-green':pct>=50?'b-amber':'b-red'}">${pct}%</span><i class="ti ti-chevron-down" style="font-size:14px;color:#6b6b66"></i></div>
+      </div>
+      <div class="hday-body">
+        ${dt.map(t=>{const p=getP(t.jardinero);const r=registros.find(x=>x.tareaId===t.id);
+          return`<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f2;font-size:12px;align-items:flex-start">
+            <i class="ti ti-${t.done?'circle-check':'circle'}" style="color:${t.done?'#639922':'#b0b0aa'};font-size:15px;margin-top:1px;flex-shrink:0"></i>
+            <div style="flex:1"><span style="font-weight:500">${t.labor}</span> — <span style="color:#6b6b66">${t.zona}</span><span style="color:#6b6b66;margin-left:8px">· ${p?p.nombre:'Sin asignar'}</span>
+              ${r&&r.obs&&r.obs!=='Marcado por supervisor'?`<div style="color:#27500a;margin-top:2px"><i class="ti ti-device-mobile"></i> ${r.obs}${r.tiempo?` · ${r.tiempo} min`:''}</div>`:''}
+            </div>${pBadge(t.prioridad)}
+          </div>`;}).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── REPORTE ───────────────────────────────────────────
+function renderReporte(){
+  const comp=tareas.filter(t=>t.done).length;
+  const hrs=Math.round(registros.reduce((a,r)=>a+(r.tiempo||0),0)/60);
+  const inc=registros.filter(r=>r.estado==='con_incidencia').length;
+  const elK=document.getElementById('rep-kpis');
+  if(elK) elK.innerHTML=`
+    <div class="kpi green"><i class="ti ti-checklist kpi-icon"></i><div class="kpi-val">${tareas.length}</div><div class="kpi-label">Total labores</div></div>
+    <div class="kpi earth"><i class="ti ti-chart-pie kpi-icon"></i><div class="kpi-val">${tareas.length?Math.round((comp/tareas.length)*100):0}%</div><div class="kpi-label">Cumplimiento global</div></div>
+    <div class="kpi blue"><i class="ti ti-hourglass kpi-icon"></i><div class="kpi-val">${hrs}h</div><div class="kpi-label">Horas de campo</div></div>
+    <div class="kpi red"><i class="ti ti-alert-triangle kpi-icon"></i><div class="kpi-val">${inc}</div><div class="kpi-label">Incidencias</div></div>`;
+
+  const elP=document.getElementById('rep-personal');
+  if(elP){elP.innerHTML=!personal.length?'<div class="empty"><i class="ti ti-users"></i>Sin personal.</div>':personal.map(p=>{
+    const ci=AC[personal.indexOf(p)%AC.length];const mis=tareas.filter(t=>t.jardinero===p.id);const c=mis.filter(t=>t.done).length;const pct=mis.length?Math.round((c/mis.length)*100):0;
+    return`<div class="wrow"><div class="avatar" style="background:${ci.bg};color:${ci.tc}">${p.nombre.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase()}</div>
+      <div style="flex:1"><div class="wname">${p.nombre}</div><div class="wmeta">${mis.length} labores · ${c} completas</div><div class="pbar" style="margin-top:4px"><div class="pbar-fill ${pct<50?'danger':pct<80?'warn':''}" style="width:${pct}%"></div></div></div>
+      <span class="badge ${pct>=80?'b-green':pct>=50?'b-amber':'b-red'}" style="margin-left:8px">${pct}%</span></div>`;}).join('')}
+
+  const elZ=document.getElementById('rep-zonas');
+  if(elZ){const zonas=[...new Set(tareas.map(t=>t.zona))];elZ.innerHTML=!zonas.length?'<div class="empty"><i class="ti ti-map-pin"></i>Sin zonas.</div>':zonas.map(z=>{
+    const tz=tareas.filter(t=>t.zona===z);const c=tz.filter(t=>t.done).length;const pct=Math.round((c/tz.length)*100);
+    return`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:500">${z}</span><span style="color:#6b6b66">${c}/${tz.length} · ${pct}%</span></div><div class="pbar"><div class="pbar-fill ${pct<50?'danger':pct<80?'warn':''}" style="width:${pct}%"></div></div></div>`;}).join('')}
+
+  const elT=document.getElementById('rep-tabla');
+  if(elT) elT.innerHTML=`<thead><tr><th>Fecha</th><th>Zona</th><th>Labor</th><th>Jardinero</th><th>Prioridad</th><th>Estado</th><th>Reporte campo</th></tr></thead><tbody>${tareas.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(t=>{const p=getP(t.jardinero);const r=registros.find(x=>x.tareaId===t.id);return`<tr><td>${fmt(t.fecha)}</td><td>${t.zona}</td><td>${t.labor}</td><td>${p?p.nombre:'—'}</td><td>${pBadge(t.prioridad)}</td><td>${t.done?'<span class="badge b-green">Completado</span>':'<span class="badge b-amber">Pendiente</span>'}</td><td style="font-size:11px;color:#6b6b66">${r&&r.obs&&r.obs!=='Marcado por supervisor'?r.obs:'—'}</td></tr>`}).join('')}</tbody>`;
+}
+
+// ── CHARTS ────────────────────────────────────────────
+const GCOLS=['#639922','#a0622e','#1a6fa8','#d68910','#2d8a6e','#7b5ea7'];
+function mkChart(id,type,data,opts={}){
+  const ctx=document.getElementById(id);if(!ctx)return null;
+  if(window['_ch_'+id]) window['_ch_'+id].destroy();
+  const ch=new Chart(ctx,{type,data,options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},...(opts.plugins||{})},scales:opts.scales||{},...opts}});
+  window['_ch_'+id]=ch;return ch;
+}
+function drawChartTrend(){
+  const days=14;const labels=[];const data=[];
+  for(let i=days-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];labels.push(fmt(ds).split(' ').slice(0,2).join(' '));data.push(tareas.filter(t=>t.fecha===ds&&t.done).length);}
+  mkChart('chart-trend','line',{labels,datasets:[{data,borderColor:GCOLS[0],backgroundColor:'rgba(97,153,34,.1)',tension:.4,pointRadius:3,borderWidth:2,fill:true}]},{scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{stepSize:1,font:{size:10}}}}});
+}
+function drawChartEstado(){
+  const h=today();const hT=tareas.filter(t=>t.fecha===h);
+  const comp=hT.filter(t=>t.done).length;const pend=hT.filter(t=>!t.done).length;
+  if(!hT.length){document.getElementById('estado-leyenda').innerHTML='<div style="font-size:12px;color:#6b6b66;text-align:center">Sin tareas para hoy.</div>';return}
+  mkChart('chart-estado','doughnut',{labels:['Completadas','Pendientes'],datasets:[{data:[comp,pend],backgroundColor:[GCOLS[0],'#e8e8e4'],borderWidth:0}]},{plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11},boxWidth:12}}}});
+  document.getElementById('estado-leyenda').innerHTML=`<div style="display:flex;gap:12px;justify-content:center"><div style="font-size:12px;color:#27500a;font-weight:600">${comp} listas</div><div style="font-size:12px;color:#6b6b66">${pend} pendientes</div></div>`;
+}
+function drawChartTipos(){
+  const tipos=[...new Set(tareas.map(t=>t.labor))].slice(0,6);
+  mkChart('chart-labor-tipos','bar',{labels:tipos.map(l=>l.length>18?l.slice(0,16)+'…':l),datasets:[{data:tipos.map(l=>tareas.filter(t=>t.labor===l).length),backgroundColor:tipos.map((_,i)=>GCOLS[i%GCOLS.length]),borderRadius:4}]},{scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{beginAtZero:true,ticks:{stepSize:1,font:{size:10}}}},plugins:{legend:{display:false}}});
+}
+function drawChartPersonal(){
+  if(!personal.length)return;
+  const labels=personal.map(p=>p.nombre.split(' ')[0]);
+  const comp=personal.map(p=>tareas.filter(t=>t.jardinero===p.id&&t.done).length);
+  const pend=personal.map(p=>tareas.filter(t=>t.jardinero===p.id&&!t.done).length);
+  mkChart('chart-personal','bar',{labels,datasets:[{label:'Completadas',data:comp,backgroundColor:GCOLS[0],borderRadius:4},{label:'Pendientes',data:pend,backgroundColor:'#e8e8e4',borderRadius:4}]},{scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:11}}},y:{stacked:true,beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{stepSize:1,font:{size:10}}}},plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11},boxWidth:12}}}});
+}
+function drawChartHistTrend(){
+  const hjid=document.getElementById('h-jard')?.value;
+  let lista=tareas;if(hjid)lista=lista.filter(t=>t.jardinero===hjid);
+  const dias=[...new Set(lista.map(t=>t.fecha))].sort().slice(-14);
+  mkChart('chart-hist-trend','bar',{labels:dias.map(d=>fmt(d).split(' ').slice(0,2).join(' ')),datasets:[{data:dias.map(d=>lista.filter(t=>t.fecha===d&&t.done).length),backgroundColor:GCOLS[0],borderRadius:4}]},{scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{beginAtZero:true,ticks:{stepSize:1,font:{size:10}}}},plugins:{legend:{display:false}}});
+}
+function drawChartHistHrs(){
+  const zonas=[...new Set(tareas.map(t=>t.zona))].slice(0,6);
+  const hrs=zonas.map(z=>Math.round(registros.filter(r=>r.zona===z).reduce((a,r)=>a+(r.tiempo||0),0)/60*10)/10);
+  mkChart('chart-hist-hrs','bar',{labels:zonas.map(z=>z.length>14?z.slice(0,12)+'…':z),datasets:[{data:hrs,backgroundColor:zonas.map((_,i)=>GCOLS[i%GCOLS.length]),borderRadius:4}]},{scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{beginAtZero:true,ticks:{font:{size:10}}}},plugins:{legend:{display:false}}});
+}
+
+// ── EXPORT ────────────────────────────────────────────
+function exportCSV(){
+  const rows=[['Fecha','Zona','Labor','Jardinero','Especialidad','Prioridad','Turno','Estado','Reporte campo','Tiempo (min)','Tipo incidencia']];
+  tareas.forEach(t=>{const p=getP(t.jardinero);const r=registros.find(x=>x.tareaId===t.id);rows.push([t.fecha,t.zona,t.labor,p?p.nombre:'Sin asignar',p?p.especialidad:'',t.prioridad,t.turno,t.done?'Completado':'Pendiente',r?r.obs:'',r&&r.tiempo?r.tiempo:'',r?r.estado:'']);});
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download=`jardines_${today()}.csv`;a.click();
+}
+function exportCSVFiltrado(){
+  const hjid=document.getElementById('h-jard')?.value;const hzona=document.getElementById('h-zona')?.value;
+  const hdes=document.getElementById('h-desde')?.value;const hhast=document.getElementById('h-hasta')?.value;
+  let lista=tareas;if(hjid)lista=lista.filter(t=>t.jardinero===hjid);if(hzona)lista=lista.filter(t=>t.zona===hzona);if(hdes)lista=lista.filter(t=>t.fecha>=hdes);if(hhast)lista=lista.filter(t=>t.fecha<=hhast);
+  const rows=[['Fecha','Zona','Labor','Jardinero','Prioridad','Estado']];
+  lista.forEach(t=>{const p=getP(t.jardinero);rows.push([t.fecha,t.zona,t.labor,p?p.nombre:'Sin asignar',t.prioridad,t.done?'Completado':'Pendiente']);});
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download=`jardines_filtrado_${today()}.csv`;a.click();
+}
+function imprimirReporte(){ window.print(); }
+
+// ── START ─────────────────────────────────────────────
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
