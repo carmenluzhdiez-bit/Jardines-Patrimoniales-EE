@@ -213,10 +213,10 @@ textarea{resize:vertical;min-height:64px}
   <div class="modal-title"><i class="ti ti-help-circle" style="color:var(--warn)"></i> Contraseñas por defecto</div>
   <div style="background:var(--g0);border:1px solid #c0dd97;border-radius:var(--r-md);padding:12px;font-size:13px;margin-bottom:14px">
    <div style="display:grid;gap:5px">
-    <div><span class="badge bg" style="margin-right:6px">Supervisor</span> super2025</div>
-    <div><span class="badge" style="background:#fdf4ee;color:var(--e7);border:1px solid #e8c9a8;margin-right:6px">Jefe AV</span> jefe2025</div>
-    <div><span class="badge bb" style="margin-right:6px">Administrador</span> adm2025</div>
-    <div><span class="badge bg" style="margin-right:6px">Jardineros</span> jard2025</div>
+    <div><span class="badge bg" style="margin-right:6px">Supervisor</span> 4971</div>
+    <div><span class="badge" style="background:#fdf4ee;color:var(--e7);border:1px solid #e8c9a8;margin-right:6px">Jefe AV</span> 4971</div>
+    <div><span class="badge bb" style="margin-right:6px">Administrador</span> 9011</div>
+    <div><span class="badge bg" style="margin-right:6px">Jardineros</span> 4855</div>
    </div>
   </div>
   <button class="btn btn-sm btn-p" onclick="closeModal('modal-forgot')">Entendido</button>
@@ -296,6 +296,47 @@ textarea{resize:vertical;min-height:64px}
  </div>
 </div>
 
+<!-- MODAL JARDINERO: registrar ejecución propia -->
+<div class="modal-ov" id="modal-pool-jard">
+ <div class="modal-box" style="max-width:440px">
+  <div class="modal-title"><i class="ti ti-edit" style="color:var(--g6)"></i> Registrar mi avance</div>
+  <input type="hidden" id="pj-eid">
+  <div id="pj-tarea-info" style="background:var(--g0);border:1px solid #c0dd97;border-radius:var(--r-sm);padding:10px 12px;margin-bottom:14px;font-size:13px"></div>
+  <!-- Self-assign -->
+  <div id="pj-assign-section" class="frow">
+   <label class="flbl">Asignar esta tarea a mi nombre</label>
+   <div style="background:var(--s0);border:1px solid var(--s1);border-radius:var(--r-sm);padding:10px 12px;font-size:13px;display:flex;align-items:center;gap:8px">
+    <i class="ti ti-user-check" style="color:var(--g6)"></i>
+    <span id="pj-mi-nombre" style="font-weight:600;color:var(--g8)"></span>
+    <span style="font-size:11px;color:var(--s5)">(solo puedes asignarte a ti mismo)</span>
+   </div>
+  </div>
+  <!-- Estado -->
+  <div class="frow" style="margin-top:10px">
+   <label class="flbl">Estado de la tarea</label>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px" id="pj-estado-btns">
+    <button class="btn" id="pjbtn-Pendiente"   onclick="selPjEstado('Pendiente')"   style="justify-content:flex-start;gap:8px"><i class="ti ti-clock" style="color:#d68910"></i> Pendiente</button>
+    <button class="btn" id="pjbtn-En proceso"   onclick="selPjEstado('En proceso')"   style="justify-content:flex-start;gap:8px"><i class="ti ti-refresh" style="color:#1a6fa8"></i> En proceso</button>
+    <button class="btn" id="pjbtn-Listo"        onclick="selPjEstado('Listo')"        style="justify-content:flex-start;gap:8px"><i class="ti ti-circle-check" style="color:#3b6d11"></i> Terminada</button>
+    <button class="btn" id="pjbtn-Húmedo"       onclick="selPjEstado('Húmedo')"       style="justify-content:flex-start;gap:8px"><i class="ti ti-droplet" style="color:#0a8fb5"></i> Húmedo</button>
+    <button class="btn" id="pjbtn-No se hizo"   onclick="selPjEstado('No se hizo')"   style="justify-content:flex-start;gap:8px"><i class="ti ti-x" style="color:#c0392b"></i> No se hizo</button>
+    <button class="btn" id="pjbtn-Con incidencia" onclick="selPjEstado('Con incidencia')" style="justify-content:flex-start;gap:8px"><i class="ti ti-alert-triangle" style="color:#d68910"></i> Incidencia</button>
+   </div>
+  </div>
+  <div class="frow"><label class="flbl">Observación de campo <span style="font-size:10px;color:var(--s5)">(requerida si hay incidencia o no se hizo)</span></label>
+   <textarea id="pj-obs" placeholder="Describe lo realizado, materiales usados, condición encontrada..." style="min-height:72px"></textarea>
+  </div>
+  <div class="frow"><label class="flbl">Tiempo invertido (minutos, opcional)</label>
+   <input type="number" id="pj-tiempo" min="0" max="480" placeholder="Ej: 90">
+  </div>
+  <div id="pj-err" style="font-size:12px;color:var(--danger);min-height:14px;margin-bottom:8px"></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end">
+   <button class="btn btn-sm" onclick="closeModal('modal-pool-jard')">Cancelar</button>
+   <button class="btn btn-sm btn-p" onclick="guardarAvanceJardinero()"><i class="ti ti-device-floppy"></i> Guardar</button>
+  </div>
+ </div>
+</div>
+
 <!-- MODAL EDITAR REGLA -->
 <div class="modal-ov" id="modal-regla">
  <div class="modal-box">
@@ -360,7 +401,7 @@ textarea{resize:vertical;min-height:64px}
   <div class="sb-sec">Operaciones</div>
   <a class="sb-item active" onclick="sw('dash',this)"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></a>
   <a class="sb-item" onclick="sw('tareas',this)"><i class="ti ti-checklist"></i><span>Todas las tareas</span></a>
-  <a class="sb-item" id="sb-programar" onclick="sw('programar',this)"><i class="ti ti-calendar-repeat"></i><span>Programar</span></a>
+  <a class="sb-item" id="sb-programar" onclick="sw('programar',this)"><i class="ti ti-calendar-repeat"></i><span>Planificación</span></a>
   <a class="sb-item" id="sb-edit" onclick="sw('editar',this)"><i class="ti ti-edit"></i><span>Editar tareas</span></a>
   <div class="sb-sec">Análisis</div>
   <a class="sb-item" onclick="sw('zonas',this)"><i class="ti ti-map-2"></i><span>Por zona</span></a>
@@ -435,62 +476,89 @@ textarea{resize:vertical;min-height:64px}
    </div>
   </div>
 
-  <!-- PROGRAMAR FRECUENCIA -->
+  <!-- PLANIFICACIÓN -->
   <div id="panel-programar" class="panel">
-   <div id="prog-banner" class="edit-banner locked" style="margin-bottom:14px"><i class="ti ti-lock"></i> Solo el Administrador puede programar tareas automáticas.</div>
-   <div id="prog-content" style="display:none">
 
-    <!-- Nueva regla de frecuencia -->
+   <!-- ── VISTA ADMINISTRADOR: crear/editar reglas ── -->
+   <div id="prog-admin-view">
+    <div id="prog-banner" class="edit-banner locked" style="margin-bottom:14px"></div>
+
+    <!-- Pool del día (visible para TODOS con acceso completo) -->
     <div class="card" style="margin-bottom:14px">
-     <div class="card-title"><i class="ti ti-calendar-repeat"></i>Nueva regla de programación automática</div>
-     <div class="g2">
-      <div class="frow"><label class="flbl">Tarea</label><select id="prog-tarea"></select></div>
-      <div class="frow"><label class="flbl">Zona</label><select id="prog-zona"></select></div>
-     </div>
-     <div class="g2">
-      <div class="frow"><label class="flbl">Sub zona / detalle</label><input type="text" id="prog-sub" placeholder="Ej: palmas, maceta norte..."></div>
-      <div class="frow"><label class="flbl">Frecuencia (días entre ejecuciones)</label>
-       <input type="number" id="prog-freq" min="1" max="365" placeholder="Ej: 3 = cada 3 días" style="width:100%">
+     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <div class="card-title" style="margin:0"><i class="ti ti-sun"></i>Pool de tareas — hoy</div>
+      <div style="display:flex;gap:8px;align-items:center">
+       <input type="date" id="pool-fecha" style="width:auto;font-size:12px;padding:5px 10px" onchange="renderPool()">
+       <button class="btn btn-sm btn-p" onclick="generarTareasPendientes();renderPool()"><i class="ti ti-bolt"></i> Actualizar pool</button>
+       <button class="btn btn-sm" id="btn-export-pool" onclick="exportPool()"><i class="ti ti-download"></i> CSV</button>
       </div>
      </div>
-     <div class="g2">
-      <div class="frow"><label class="flbl">Responsable inicial</label><select id="prog-resp"></select></div>
-      <div class="frow"><label class="flbl">Primera fecha de ejecución</label><input type="date" id="prog-inicio"></div>
-     </div>
-     <div class="frow"><label class="flbl">Instrucciones / observaciones</label>
-      <textarea id="prog-obs" placeholder="Productos a usar, cantidad, EPP requerido..."></textarea>
-     </div>
-     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
-      <button class="btn btn-sm" onclick="clearProgForm()"><i class="ti ti-refresh"></i> Limpiar</button>
-      <button class="btn btn-sm btn-p" onclick="agregarRegla()"><i class="ti ti-plus"></i> Agregar regla</button>
-     </div>
+     <div id="pool-resumen" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"></div>
+     <div id="pool-lista"></div>
     </div>
 
-    <!-- Reglas activas -->
-    <div class="card" style="margin-bottom:14px">
-     <div class="card-title"><i class="ti ti-list-check"></i>Reglas activas
-      <button class="btn btn-sm btn-p" style="margin-left:auto;font-size:11px" onclick="generarTareasPendientes()"><i class="ti ti-bolt"></i> Generar tareas pendientes ahora</button>
+    <!-- Reglas de programación (solo Administrador) -->
+    <div id="prog-admin-section">
+     <div class="card" style="margin-bottom:14px">
+      <div class="card-title"><i class="ti ti-calendar-plus"></i>Nueva regla de programación</div>
+      <div class="g2">
+       <div class="frow"><label class="flbl">Categoría</label>
+        <select id="prog-general" onchange="syncProgTareas()">
+         <option value="">— Categoría —</option>
+        </select>
+       </div>
+       <div class="frow"><label class="flbl">Tarea</label><select id="prog-tarea"><option value="">— Tarea —</option></select></div>
+      </div>
+      <div class="g2">
+       <div class="frow"><label class="flbl">Zona</label><select id="prog-zona"><option value="">— Zona —</option></select></div>
+       <div class="frow"><label class="flbl">Sub zona / detalle</label><input type="text" id="prog-sub" placeholder="Ej: sector norte, palmas..."></div>
+      </div>
+      <div class="g2">
+       <div class="frow"><label class="flbl">Frecuencia (días entre ejecuciones)</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px" id="freq-chips">
+         <button class="fchip" onclick="setFreq(1,this)">Diario</button>
+         <button class="fchip" onclick="setFreq(2,this)">C/2 días</button>
+         <button class="fchip" onclick="setFreq(3,this)">C/3 días</button>
+         <button class="fchip" onclick="setFreq(7,this)">Semanal</button>
+         <button class="fchip" onclick="setFreq(14,this)">Quincenal</button>
+         <button class="fchip" onclick="setFreq(30,this)">Mensual</button>
+        </div>
+        <input type="number" id="prog-freq" min="1" max="365" placeholder="O escribe: Nº días" style="margin-top:6px" oninput="clearFreqChips()">
+       </div>
+       <div class="frow"><label class="flbl">Primera fecha de ejecución</label><input type="date" id="prog-inicio"></div>
+      </div>
+      <div class="frow"><label class="flbl">Instrucciones / observaciones</label>
+       <textarea id="prog-obs" placeholder="EPP requerido, productos, cuidados especiales..."></textarea>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+       <button class="btn btn-sm" onclick="clearProgForm()"><i class="ti ti-refresh"></i> Limpiar</button>
+       <button class="btn btn-sm btn-p" onclick="agregarRegla()"><i class="ti ti-plus"></i> Agregar regla</button>
+      </div>
      </div>
-     <div id="reglas-lista"></div>
-    </div>
 
-    <!-- Historial de ejecuciones -->
-    <div class="card">
-     <div class="card-title"><i class="ti ti-history"></i>Historial de ejecuciones programadas</div>
-     <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-      <select id="hist-prog-resp" style="width:auto" onchange="renderHistorialProg()"><option value="">Todos los responsables</option></select>
-      <select id="hist-prog-zona" style="width:auto" onchange="renderHistorialProg()"><option value="">Todas las zonas</option></select>
-     </div>
-     <div class="tbl-wrap" style="max-height:340px">
-      <table class="tbl">
-       <thead><tr><th>Fecha</th><th>Tarea</th><th>Zona</th><th>Responsable asignado</th><th>Estado</th><th>Obs</th><th>Acción</th></tr></thead>
-       <tbody id="hist-prog-body"></tbody>
-      </table>
+     <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+       <div class="card-title" style="margin:0"><i class="ti ti-list-check"></i>Reglas activas</div>
+       <button class="btn btn-sm" onclick="generarTareasPendientes();renderPool();renderReglas()"><i class="ti ti-refresh"></i> Regenerar pool</button>
+      </div>
+      <div id="reglas-lista"></div>
      </div>
     </div>
    </div>
-  </div>
 
+   <!-- ── VISTA JARDINERO: solo ve y edita su pool del día ── -->
+   <div id="prog-jard-view" style="display:none">
+    <div style="background:var(--g0);border:1px solid #c0dd97;border-radius:var(--r-md);padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
+     <i class="ti ti-sun" style="font-size:20px;color:var(--g7)"></i>
+     <div><div style="font-weight:600;color:var(--g9)" id="jard-pool-titulo">Tus tareas de hoy</div>
+      <div style="font-size:12px;color:var(--s5)" id="jard-pool-fecha"></div>
+     </div>
+     <input type="date" id="jard-pool-fecha-input" style="width:auto;font-size:12px;padding:4px 8px;margin-left:auto" onchange="renderPoolJardinero()">
+    </div>
+    <div id="jard-pool-lista"></div>
+   </div>
+
+  </div>
   <!-- EDITAR (solo administrador) -->
   <div id="panel-editar" class="panel">
    <div id="edit-banner" class="edit-banner locked"><i class="ti ti-lock"></i> Solo el Administrador puede editar tareas directamente.</div>
@@ -970,7 +1038,7 @@ async function loadData(){
 }
 
 // === AUTH ===
-const DPWD={supervisor:'super2025',jefe:'jefe2025',operador:'adm2025',jardinero:'jard2025'};
+const DPWD={supervisor:'4971',jefe:'4971',operador:'9011',jardinero:'4855'};
 const FULL=['supervisor','jefe','operador'];
 let SESSION=null, loginRole='supervisor';
 
@@ -1017,10 +1085,26 @@ function applyRoleUI(){
   if(sbEdit) sbEdit.classList.toggle('locked',!op);
   const sbProg=document.getElementById('sb-programar');
   if(sbProg) sbProg.classList.toggle('locked',!op);
-  // Programar panel banner
+  // Programar panel — dual view: admin sees rules+pool, jardinero sees only their pool
+  if(sbProg) sbProg.classList.toggle('locked', false); // visible for ALL
   const pb=document.getElementById('prog-banner');
-  const pc=document.getElementById('prog-content');
-  if(pb&&pc){pb.className=op?'edit-banner allowed':'edit-banner locked';pb.innerHTML=op?'<i class="ti ti-calendar-repeat"></i> Modo Administrador: puedes crear y gestionar reglas de programación automática.':'<i class="ti ti-lock"></i> Solo el Administrador puede programar tareas automáticas.';pc.style.display=op?'block':'none';}
+  const adminView=document.getElementById('prog-admin-view');
+  const jardView=document.getElementById('prog-jard-view');
+  const adminSection=document.getElementById('prog-admin-section');
+  if(isJardinero()){
+    if(pb){pb.style.display='none';}
+    if(adminView){adminView.style.display='none';}
+    if(jardView){jardView.style.display='block';}
+  } else {
+    if(pb){
+      pb.style.display='flex';
+      pb.className=op?'edit-banner allowed':'edit-banner locked';
+      pb.innerHTML=op?'<i class="ti ti-calendar-repeat"></i> Modo Administrador: crea y gestiona reglas de programación automática.':'<i class="ti ti-info-circle"></i> Vista de planificación — solo el Administrador puede agregar reglas.';
+    }
+    if(adminView){adminView.style.display='block';}
+    if(jardView){jardView.style.display='none';}
+    if(adminSection){adminSection.style.display=op?'block':'none';}
+  }
   // Admin panel banner
   const ab=document.getElementById('admin-banner');
   if(ab){ab.className=op?'edit-banner allowed':'edit-banner locked';ab.innerHTML=op?'<i class="ti ti-database"></i> Modo Administrador: puedes agregar categorías, tareas, zonas y responsables.':'<i class="ti ti-lock"></i> Solo el Administrador puede administrar datos del sistema. Vista de solo lectura.';}
@@ -1088,7 +1172,11 @@ function sw(name,el){
   document.getElementById('page-title').textContent=titles[name]||name;
   if(name==='dash') renderDash();
   if(name==='tareas') renderTabla();
-  if(name==='programar'){populateProgForm();renderReglas();renderHistorialProg();}
+  if(name==='programar'){
+    populateProgForm();
+    if(isJardinero()){renderPoolJardinero();}
+    else{renderPool();renderReglas();}
+  }
   if(name==='editar') renderEditTabla();
   if(name==='zonas') renderZonas();
   if(name==='responsables') renderResp();
@@ -1576,10 +1664,10 @@ function renderAll(){
 }
 
 // ════════════════════════════════════════
-//  SCHEDULER SYSTEM
+//  SCHEDULER SYSTEM — POOL DIARIO
 // ════════════════════════════════════════
-const SK_REGLAS='jp_reglas_v1',SK_EXEC='jp_exec_v1';
-let REGLAS=[],EJECUCIONES=[];
+const SK_REGLAS='jp_reglas_v1', SK_EXEC='jp_exec_v2';
+let REGLAS=[], EJECUCIONES=[];
 
 function loadScheduler(){
   try{REGLAS=JSON.parse(localStorage.getItem(SK_REGLAS)||'[]');}catch(e){REGLAS=[];}
@@ -1593,70 +1681,302 @@ function uid2(){return Date.now().toString(36)+Math.random().toString(36).slice(
 function todayStr(){return new Date().toISOString().split('T')[0];}
 function addDays(ds,n){const d=new Date(ds+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
 
+// ── Frequency chip selector ──────────────────────
+let _freqVal = 1;
+function setFreq(n, el){
+  _freqVal = n;
+  document.getElementById('prog-freq').value = n;
+  document.querySelectorAll('#freq-chips .fchip').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+function clearFreqChips(){
+  _freqVal = parseInt(document.getElementById('prog-freq').value)||1;
+  document.querySelectorAll('#freq-chips .fchip').forEach(b=>b.classList.remove('active'));
+}
+function syncProgTareas(){
+  const gen = document.getElementById('prog-general')?.value||'';
+  const sel = document.getElementById('prog-tarea');
+  if(!sel) return;
+  if(!gen){ sel.innerHTML='<option value="">— Tarea —</option>'; return; }
+  const tareas = META.tree[gen]||[];
+  sel.innerHTML='<option value="">— Tarea —</option>'+tareas.map(t=>`<option value="${t}">${t.includes('/')?t.split('/')[1]:t}</option>`).join('');
+}
+
+// ── Add rule ─────────────────────────────────────
 function agregarRegla(){
-  if(!isOperador())return;
-  const tarea=document.getElementById('prog-tarea').value;
-  const zona=document.getElementById('prog-zona').value;
-  const sub=document.getElementById('prog-sub').value.trim();
-  const freq=parseInt(document.getElementById('prog-freq').value);
-  const resp=document.getElementById('prog-resp').value;
-  const inicio=document.getElementById('prog-inicio').value;
-  const obs=document.getElementById('prog-obs').value.trim();
-  if(!tarea||!zona||!freq||!resp||!inicio){alert('Completa: tarea, zona, frecuencia, responsable y fecha de inicio.');return;}
-  REGLAS.push({id:uid2(),tarea,zona,sub,freq,resp,obs,activa:true,fechaInicio:inicio,creadaEn:new Date().toISOString()});
-  saveScheduler();clearProgForm();renderReglas();
+  if(!isOperador()) return;
+  const general= document.getElementById('prog-general').value;
+  const tarea  = document.getElementById('prog-tarea').value;
+  const zona   = document.getElementById('prog-zona').value;
+  const sub    = document.getElementById('prog-sub').value.trim();
+  const freq   = parseInt(document.getElementById('prog-freq').value)||_freqVal;
+  const inicio = document.getElementById('prog-inicio').value;
+  const obs    = document.getElementById('prog-obs').value.trim();
+  if(!tarea||!zona||!freq||!inicio){alert('Completa: tarea, zona, frecuencia y fecha de inicio.');return;}
+  REGLAS.push({id:uid2(),general,tarea,zona,sub,freq,obs,activa:true,fechaInicio:inicio,creadaEn:new Date().toISOString()});
+  saveScheduler();
+  clearProgForm();
   generarTareasPendientes();
+  renderReglas();
+  renderPool();
 }
 
 function clearProgForm(){
   ['prog-sub','prog-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const pf=document.getElementById('prog-freq');if(pf)pf.value='';
   const pi=document.getElementById('prog-inicio');if(pi)pi.value=todayStr();
+  document.querySelectorAll('#freq-chips .fchip').forEach(b=>b.classList.remove('active'));
+  _freqVal=1;
 }
 
+// ── Generate pending tasks into pool ─────────────
 function generarTareasPendientes(){
-  const today=todayStr();let gen=0;
+  const today=todayStr(); let gen=0;
   REGLAS.filter(r=>r.activa).forEach(regla=>{
-    const execs=EJECUCIONES.filter(e=>e.reglaId===regla.id).sort((a,b)=>a.fecha.localeCompare(b.fecha));
-    const lastDone=execs.filter(e=>['Listo','Húmedo'].includes(e.estado)).slice(-1)[0];
+    // Find last COMPLETED execution for this rule
+    const done=EJECUCIONES.filter(e=>e.reglaId===regla.id&&['Listo','Húmedo'].includes(e.estado)).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+    const lastDone=done.slice(-1)[0];
     const lastDate=lastDone?lastDone.fecha:addDays(regla.fechaInicio,-regla.freq);
-    let next=addDays(lastDate,regla.freq);let safety=0;
-    while(next<=addDays(today,regla.freq)&&safety<60){
+    // Generate all instances from lastDate+freq up to today (inclusive)
+    let next=addDays(lastDate,regla.freq); let safety=0;
+    while(next<=today&&safety<120){
       safety++;
       if(!EJECUCIONES.find(e=>e.reglaId===regla.id&&e.fecha===next)){
-        EJECUCIONES.push({id:uid2(),reglaId:regla.id,tarea:regla.tarea,zona:regla.zona,sub:regla.sub,resp:regla.resp,fecha:next,estado:next<=today?'Pendiente':'Programada',obs:'',ts:Date.now(),auto:true});
+        EJECUCIONES.push({
+          id:uid2(), reglaId:regla.id,
+          general:regla.general, tarea:regla.tarea, zona:regla.zona, sub:regla.sub,
+          obs:regla.obs,
+          fecha:next,
+          resp:null,        // unassigned — jardinero se asigna a sí mismo
+          estado:'Pendiente',
+          nota:'', tiempo:null,
+          ts:Date.now(),
+        });
         gen++;
       }
       next=addDays(next,regla.freq);
     }
+    // Also pre-generate next future instance so it shows as "próxima"
+    if(!EJECUCIONES.find(e=>e.reglaId===regla.id&&e.fecha===next)){
+      EJECUCIONES.push({
+        id:uid2(),reglaId:regla.id,general:regla.general,tarea:regla.tarea,zona:regla.zona,sub:regla.sub,
+        obs:regla.obs,fecha:next,resp:null,estado:'Próxima',nota:'',tiempo:null,ts:Date.now(),
+      });
+      gen++;
+    }
   });
-  saveScheduler();renderHistorialProg();renderReglas();
+  if(gen>0) saveScheduler();
   return gen;
 }
 
+// ── POOL RENDER (admin/supervisor/jefe view) ──────
+function renderPool(){
+  const el=document.getElementById('pool-lista');
+  const resEl=document.getElementById('pool-resumen');
+  if(!el) return;
+  const fi=document.getElementById('pool-fecha');
+  if(fi&&!fi.value) fi.value=todayStr();
+  const fecha=fi?.value||todayStr();
+  const pool=EJECUCIONES.filter(e=>e.fecha===fecha).sort((a,b)=>{
+    const order={Pendiente:0,'En proceso':1,'Con incidencia':2,Listo:3,Húmedo:3,'No se hizo':4,Próxima:5};
+    return (order[a.estado]??9)-(order[b.estado]??9);
+  });
+
+  // Summary badges
+  const byEst={};
+  pool.forEach(e=>{ byEst[e.estado]=(byEst[e.estado]||0)+1; });
+  const estColors={Pendiente:'ba','En proceso':'bb',Listo:'bg',Húmedo:'bt','No se hizo':'br','Con incidencia':'ba',Próxima:'bgr'};
+  resEl.innerHTML=Object.entries(byEst).map(([e,n])=>
+    `<span class="badge ${estColors[e]||'bgr'}">${e}: ${n}</span>`).join('')+
+    `<span class="badge bgr" style="margin-left:4px">Total: ${pool.length}</span>`;
+
+  if(!pool.length){
+    el.innerHTML=`<div class="empty"><i class="ti ti-calendar-off"></i>Sin tareas para ${fmtDate(fecha)}.<br><span style="font-size:12px">Agrega reglas y presiona "Actualizar pool".</span></div>`;
+    return;
+  }
+  const estIcon={Pendiente:'ti-clock','En proceso':'ti-refresh',Listo:'ti-circle-check',Húmedo:'ti-droplet','No se hizo':'ti-x','Con incidencia':'ti-alert-triangle',Próxima:'ti-calendar'};
+  el.innerHTML=`<table class="tbl"><thead><tr>
+    <th>Estado</th><th>Categoría / Tarea</th><th>Zona</th><th>Sub zona</th>
+    <th>Responsable</th><th>Tiempo</th><th>Nota</th><th>Regla</th>
+   </tr></thead><tbody>`+
+  pool.map(e=>{
+    const regla=REGLAS.find(r=>r.id===e.reglaId);
+    const tareaShort=e.tarea.includes('/')?e.tarea.split('/')[1]:e.tarea;
+    const eIcon=estIcon[e.estado]||'ti-circle';
+    const eBadgeMap={Pendiente:'ba','En proceso':'bb',Listo:'bg',Húmedo:'bt','No se hizo':'br','Con incidencia':'ba',Próxima:'bgr'};
+    return`<tr>
+      <td><span class="badge ${eBadgeMap[e.estado]||'bgr'}"><i class="ti ${eIcon}" style="font-size:11px"></i> ${e.estado}</span></td>
+      <td><span style="font-size:10px;color:var(--s5)">${e.general}/</span><strong>${tareaShort}</strong></td>
+      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.zona}">${e.zona}</td>
+      <td style="font-size:11px;color:var(--s5)">${e.sub||'—'}</td>
+      <td>${e.resp?`<span class="badge bg">${e.resp}</span>`:'<span style="font-size:11px;color:var(--s5)">Sin asignar</span>'}</td>
+      <td style="font-size:11px;color:var(--s5)">${e.tiempo?e.tiempo+' min':'—'}</td>
+      <td style="font-size:11px;color:var(--s5);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.nota||''}">${e.nota||'—'}</td>
+      <td style="font-size:11px;color:var(--s5)">${regla?'c/'+regla.freq+'d':'—'}</td>
+    </tr>`;
+  }).join('')+'</tbody></table>';
+}
+
+// ── POOL JARDINERO VIEW ──────────────────────────
+function renderPoolJardinero(){
+  const el=document.getElementById('jard-pool-lista');
+  if(!el||!SESSION) return;
+  const fi=document.getElementById('jard-pool-fecha-input');
+  if(fi&&!fi.value) fi.value=todayStr();
+  const fecha=fi?.value||todayStr();
+  document.getElementById('jard-pool-fecha').textContent=fmtDate(fecha);
+  document.getElementById('jard-pool-titulo').textContent=`Planificación del ${fmtDate(fecha)}`;
+
+  // Show ALL pool tasks for the day (not just assigned) so jardinero can self-assign
+  const pool=EJECUCIONES.filter(e=>e.fecha===fecha&&e.estado!=='Próxima').sort((a,b)=>{
+    // Own tasks first, then unassigned, then others
+    const aOwn=a.resp===SESSION.nombre?0:a.resp===null?1:2;
+    const bOwn=b.resp===SESSION.nombre?0:b.resp===null?1:2;
+    return aOwn-bOwn;
+  });
+
+  if(!pool.length){
+    el.innerHTML=`<div class="empty"><i class="ti ti-calendar-off"></i>Sin tareas programadas para este día.</div>`;
+    return;
+  }
+
+  const estIcon={Pendiente:'ti-clock','En proceso':'ti-refresh',Listo:'ti-circle-check',Húmedo:'ti-droplet','No se hizo':'ti-x','Con incidencia':'ti-alert-triangle'};
+  const eBadgeMap={Pendiente:'ba','En proceso':'bb',Listo:'bg',Húmedo:'bt','No se hizo':'br','Con incidencia':'ba'};
+
+  el.innerHTML=pool.map(e=>{
+    const isOwn   = e.resp===SESSION.nombre;
+    const isFree  = !e.resp;
+    const isOther = e.resp && !isOwn;
+    const regla   = REGLAS.find(r=>r.id===e.reglaId);
+    const tareaShort = e.tarea.includes('/')?e.tarea.split('/')[1]:e.tarea;
+    const canEdit = isOwn||isFree; // jardinero can only edit own or unassigned
+
+    const borderColor = isOwn?'var(--g5)':isFree?'var(--s3)':'var(--s1)';
+    const bgColor     = isOwn?'var(--g0)':isFree?'var(--cream)':'var(--white)';
+
+    return`<div style="border:1.5px solid ${borderColor};background:${bgColor};border-radius:var(--r-md);padding:14px 16px;margin-bottom:10px">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+       <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+         <span class="badge ${eBadgeMap[e.estado]||'bgr'}"><i class="ti ${estIcon[e.estado]||'ti-circle'}" style="font-size:11px"></i> ${e.estado}</span>
+         <span style="font-size:10px;color:var(--s5);background:var(--s0);padding:1px 7px;border-radius:10px">${e.general}</span>
+         ${isOwn?'<span class="badge bg" style="font-size:10px"><i class="ti ti-user-check"></i> Mi tarea</span>':''}
+         ${isFree?'<span class="badge bgr" style="font-size:10px">Disponible — puedes tomarla</span>':''}
+         ${isOther?`<span style="font-size:11px;color:var(--s5)">Asignada a: <strong>${e.resp}</strong></span>`:''}
+        </div>
+        <div style="font-size:14px;font-weight:600;color:var(--g9);margin-bottom:3px">${tareaShort}</div>
+        <div style="font-size:12px;color:var(--s5)"><i class="ti ti-map-pin"></i> ${e.zona}${e.sub?' · '+e.sub:''}</div>
+        ${e.obs?`<div style="font-size:11px;color:var(--s5);margin-top:5px;padding:4px 8px;background:var(--s0);border-radius:4px;border-left:2px solid var(--g3)"><i class="ti ti-notes"></i> ${e.obs}</div>`:''}
+        ${regla?`<div style="font-size:10px;color:var(--s5);margin-top:4px"><i class="ti ti-refresh"></i> Frecuencia: cada ${regla.freq} día${regla.freq>1?'s':''}</div>`:''}
+       </div>
+       ${canEdit?`<button class="btn btn-sm btn-p" onclick="abrirPoolJardinero('${e.id}')" style="flex-shrink:0">
+         <i class="ti ti-${isFree?'user-plus':'edit'}"></i> ${isFree?'Tomar tarea':'Actualizar'}
+        </button>`:'<div style="font-size:11px;color:var(--s3);padding:4px 8px">Solo lectura</div>'}
+      </div>
+      ${e.nota?`<div style="font-size:12px;color:var(--g7);margin-top:8px;padding:6px 10px;background:var(--g0);border-radius:4px"><i class="ti ti-device-mobile"></i> Mi registro: ${e.nota}${e.tiempo?' · '+e.tiempo+' min':''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── Open jardinero modal ──────────────────────────
+let _pjEstado=null;
+function abrirPoolJardinero(eid){
+  const exec=EJECUCIONES.find(e=>e.id===eid);
+  if(!exec||!SESSION) return;
+  // Block if assigned to someone else
+  if(exec.resp&&exec.resp!==SESSION.nombre){
+    alert(`Esta tarea ya fue tomada por ${exec.resp}.`); return;
+  }
+  _pjEstado=exec.estado==='Pendiente'||exec.estado==='Próxima'?null:exec.estado;
+  document.getElementById('pj-eid').value=eid;
+  const tareaShort=exec.tarea.includes('/')?exec.tarea.split('/')[1]:exec.tarea;
+  document.getElementById('pj-tarea-info').innerHTML=
+    `<strong>${tareaShort}</strong><span style="color:var(--s5);margin-left:6px">${exec.zona}${exec.sub?' · '+exec.sub:''}</span>`+
+    (exec.obs?`<div style="font-size:11px;color:var(--s5);margin-top:4px">${exec.obs}</div>`:'');
+  document.getElementById('pj-mi-nombre').textContent=SESSION.nombre;
+  document.getElementById('pj-obs').value=exec.nota||'';
+  document.getElementById('pj-tiempo').value=exec.tiempo||'';
+  document.getElementById('pj-err').textContent='';
+  // Reset estado buttons
+  ['Pendiente','En proceso','Listo','Húmedo','No se hizo','Con incidencia'].forEach(s=>{
+    const b=document.getElementById('pjbtn-'+s);
+    if(b) b.style.cssText=`justify-content:flex-start;gap:8px;${_pjEstado===s?'border-color:var(--g5);background:var(--g0);font-weight:600':''}`;
+  });
+  openModal('modal-pool-jard');
+}
+function selPjEstado(s){
+  _pjEstado=s;
+  ['Pendiente','En proceso','Listo','Húmedo','No se hizo','Con incidencia'].forEach(st=>{
+    const b=document.getElementById('pjbtn-'+st);
+    if(b) b.style.cssText=`justify-content:flex-start;gap:8px;${st===s?'border-color:var(--g5);background:var(--g0);font-weight:600':''}`;
+  });
+}
+function guardarAvanceJardinero(){
+  const eid=document.getElementById('pj-eid').value;
+  const nota=document.getElementById('pj-obs').value.trim();
+  const tiempo=document.getElementById('pj-tiempo').value;
+  const err=document.getElementById('pj-err');
+  if(!_pjEstado){err.textContent='Selecciona el estado de la tarea.';return;}
+  if(['No se hizo','Con incidencia'].includes(_pjEstado)&&!nota){
+    err.textContent='La observación es obligatoria para este estado.';return;
+  }
+  const exec=EJECUCIONES.find(e=>e.id===eid);
+  if(!exec){err.textContent='Tarea no encontrada.';return;}
+  // Assign to self (cannot assign to others)
+  exec.resp=SESSION.nombre;
+  exec.estado=_pjEstado;
+  exec.nota=nota;
+  exec.tiempo=tiempo?parseInt(tiempo):null;
+  exec.ts=Date.now();
+  // If completed → auto-generate next occurrence
+  if(['Listo','Húmedo'].includes(_pjEstado)){
+    const regla=REGLAS.find(r=>r.id===exec.reglaId);
+    if(regla&&regla.activa){
+      const next=addDays(exec.fecha,regla.freq);
+      // Remove old "Próxima" placeholder and add real pending
+      const oldProx=EJECUCIONES.find(e=>e.reglaId===regla.id&&e.estado==='Próxima');
+      if(oldProx){oldProx.fecha=next;oldProx.estado='Pendiente';oldProx.resp=null;}
+      else if(!EJECUCIONES.find(e=>e.reglaId===regla.id&&e.fecha===next)){
+        EJECUCIONES.push({id:uid2(),reglaId:regla.id,general:regla.general,tarea:regla.tarea,
+          zona:regla.zona,sub:regla.sub,obs:regla.obs,fecha:next,resp:null,
+          estado:next<=todayStr()?'Pendiente':'Próxima',nota:'',tiempo:null,ts:Date.now()});
+      }
+    }
+  }
+  saveScheduler();
+  closeModal('modal-pool-jard');
+  renderPoolJardinero();
+  if(!isJardinero()) renderPool();
+  showToast(`✅ Tarea "${exec.tarea.includes('/')?exec.tarea.split('/')[1]:exec.tarea}" marcada como ${_pjEstado}`,'green');
+}
+
+// ── Render rules table (admin) ────────────────────
 function renderReglas(){
   const el=document.getElementById('reglas-lista');if(!el)return;
-  if(!REGLAS.length){el.innerHTML='<div class="empty" style="padding:1rem"><i class="ti ti-calendar-off"></i>Sin reglas activas. Agrega una arriba.</div>';return;}
+  if(!REGLAS.length){el.innerHTML='<div class="empty" style="padding:1rem"><i class="ti ti-calendar-off"></i>Sin reglas. Agrega una arriba.</div>';return;}
   const today=todayStr();
-  el.innerHTML=`<table class="tbl"><thead><tr><th>Tarea</th><th>Zona / Sub zona</th><th>Cada</th><th>Responsable</th><th>Próxima</th><th>Estado</th><th></th></tr></thead><tbody>`+
+  el.innerHTML=`<table class="tbl"><thead><tr>
+    <th>Tarea</th><th>Zona</th><th>Frecuencia</th><th>Próxima</th><th>Pendientes hoy</th><th>Estado</th><th></th>
+   </tr></thead><tbody>`+
   REGLAS.map(r=>{
-    const execs=EJECUCIONES.filter(e=>e.reglaId===r.id&&['Listo','Húmedo'].includes(e.estado)).sort((a,b)=>a.fecha.localeCompare(b.fecha));
-    const last=execs.slice(-1)[0];
+    const done=EJECUCIONES.filter(e=>e.reglaId===r.id&&['Listo','Húmedo'].includes(e.estado)).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+    const last=done.slice(-1)[0];
     const lastDate=last?last.fecha:addDays(r.fechaInicio,-r.freq);
     const next=addDays(lastDate,r.freq);
     const overdue=next<today;
+    const pendHoy=EJECUCIONES.filter(e=>e.reglaId===r.id&&e.fecha===today&&e.estado==='Pendiente').length;
     const ts=r.tarea.includes('/')?r.tarea.split('/')[1]:r.tarea;
     return`<tr>
-      <td><span style="font-size:10px;color:var(--s5)">${r.tarea.split('/')[0]||''} / </span>${ts}</td>
-      <td>${r.zona}${r.sub?`<br><span style="font-size:10px;color:var(--s5)">${r.sub}</span>`:''}</td>
-      <td><span class="badge bgr">${r.freq} días</span></td>
-      <td style="font-size:12px">${r.resp}</td>
+      <td><span style="font-size:10px;color:var(--s5)">${r.general}/</span><strong>${ts}</strong>${r.sub?'<br><span style="font-size:10px;color:var(--s5)">'+ r.sub+'</span>':''}</td>
+      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.zona}</td>
+      <td><span class="badge bgr">c/${r.freq} días</span></td>
       <td><span class="badge ${overdue?'br':next===today?'ba':'bg'}">${overdue?'⚠️ ':next===today?'🔔 ':''} ${fmtDate(next)}</span></td>
+      <td>${pendHoy>0?`<span class="badge ba">${pendHoy} pendiente${pendHoy>1?'s':''}</span>`:'<span style="font-size:11px;color:var(--s5)">—</span>'}</td>
       <td>${r.activa?'<span class="badge bg">Activa</span>':'<span class="badge bgr">Pausada</span>'}</td>
       <td style="white-space:nowrap;display:flex;gap:3px">
-        <button class="btn btn-sm" onclick="editarRegla('${r.id}')" title="Editar" style="padding:3px 7px"><i class="ti ti-edit" style="font-size:13px"></i></button>
-        <button class="btn btn-sm" onclick="toggleRegla('${r.id}')" title="${r.activa?'Pausar':'Activar'}" style="padding:3px 7px"><i class="ti ti-${r.activa?'pause':'player-play'}" style="font-size:13px"></i></button>
-        <button class="btn btn-sm btn-danger" onclick="eliminarRegla('${r.id}')" title="Eliminar" style="padding:3px 7px"><i class="ti ti-trash" style="font-size:13px"></i></button>
+        <button class="btn btn-sm" onclick="editarRegla('${r.id}')" style="padding:3px 7px"><i class="ti ti-edit" style="font-size:13px"></i></button>
+        <button class="btn btn-sm" onclick="toggleRegla('${r.id}')" style="padding:3px 7px"><i class="ti ti-${r.activa?'pause':'player-play'}" style="font-size:13px"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="eliminarRegla('${r.id}')" style="padding:3px 7px"><i class="ti ti-trash" style="font-size:13px"></i></button>
       </td>
     </tr>`;
   }).join('')+'</tbody></table>';
@@ -1671,337 +1991,46 @@ function editarRegla(id){
   document.getElementById('regla-freq').value=r.freq;
   document.getElementById('regla-sub').value=r.sub||'';
   document.getElementById('regla-obs').value=r.obs||'';
-  // Populate selects
-  const rt=document.getElementById('regla-tarea');if(rt){let h='';Object.entries(META.tree||{}).forEach(([g,subs])=>{h+=`<optgroup label="${g}">`;subs.forEach(t=>{h+=`<option value="${t}">${t}</option>`;});h+=`</optgroup>`;});rt.innerHTML=h;rt.value=r.tarea;}
+  const rt=document.getElementById('regla-tarea');
+  if(rt){let h='';Object.entries(META.tree||{}).forEach(([g,subs])=>{h+=`<optgroup label="${g}">`;subs.forEach(t=>{h+=`<option value="${t}">${t}</option>`;});h+='</optgroup>';});rt.innerHTML=h;rt.value=r.tarea;}
   const rz=document.getElementById('regla-zona');if(rz){rz.innerHTML=META.zonas.map(z=>`<option>${z}</option>`).join('');rz.value=r.zona;}
-  const rr=document.getElementById('regla-resp');if(rr){rr.innerHTML=META.responsables.map(x=>`<option>${x}</option>`).join('');rr.value=r.resp;}
+  const rr=document.getElementById('regla-resp');
+  if(rr){rr.style.display='none';} // no default resp in new system
   openModal('modal-regla');
 }
-
 function guardarRegla(){
   const id=document.getElementById('regla-id').value;
   const r=REGLAS.find(x=>x.id===id);if(!r)return;
   r.tarea=document.getElementById('regla-tarea').value||r.tarea;
   r.zona=document.getElementById('regla-zona').value||r.zona;
   r.freq=parseInt(document.getElementById('regla-freq').value)||r.freq;
-  r.resp=document.getElementById('regla-resp').value||r.resp;
   r.sub=document.getElementById('regla-sub').value;
   r.obs=document.getElementById('regla-obs').value;
-  saveScheduler();closeModal('modal-regla');renderReglas();
+  saveScheduler();closeModal('modal-regla');renderReglas();renderPool();
 }
 
-function renderHistorialProg(){
-  const el=document.getElementById('hist-prog-body');if(!el)return;
-  const fr=document.getElementById('hist-prog-resp')?.value||'';
-  const fz=document.getElementById('hist-prog-zona')?.value||'';
-  const execs=[...EJECUCIONES].filter(e=>(!fr||e.resp===fr)&&(!fz||e.zona===fz)).sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  const emap={Listo:'bg',Pendiente:'ba',Húmedo:'bt','En proceso':'bb','No se hizo':'br',Programada:'bgr'};
-  const today=todayStr();
-  if(!execs.length){el.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--s5);padding:1rem">Sin ejecuciones aún.</td></tr>';return;}
-  el.innerHTML=execs.slice(0,200).map(e=>{
-    const regla=REGLAS.find(r=>r.id===e.reglaId);
-    const ts=e.tarea.includes('/')?e.tarea.split('/')[1]:e.tarea;
-    const canReg=['Pendiente','Programada','En proceso'].includes(e.estado)||e.fecha<=today;
-    return`<tr>
-      <td style="white-space:nowrap">${fmtDate(e.fecha)}</td>
-      <td><span style="font-size:10px;color:var(--s5)">${e.tarea.split('/')[0]||''}/</span>${ts}${e.sub?`<br><span style="font-size:10px;color:var(--s5)">${e.sub}</span>`:''}</td>
-      <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.zona}">${e.zona}</td>
-      <td style="font-size:12px">${e.resp}${regla?`<br><span style="font-size:10px;color:var(--s5)">c/${regla.freq}d</span>`:''}</td>
-      <td><span class="badge ${emap[e.estado]||'bgr'}">${e.estado}</span></td>
-      <td style="font-size:11px;color:var(--s5);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.obs}">${e.obs||'—'}</td>
-      <td><button class="btn btn-sm ${canReg?'btn-p':''}" onclick="abrirModalEjecucion('${e.id}')" style="padding:3px 8px;font-size:11px"><i class="ti ti-${['Listo','Húmedo'].includes(e.estado)?'edit':'circle-check'}" style="font-size:12px"></i></button></td>
-    </tr>`;
-  }).join('');
-  // Populate filter selects
-  const hr=document.getElementById('hist-prog-resp');if(hr&&hr.options.length<=1)hr.innerHTML='<option value="">Todos</option>'+META.responsables.map(r=>`<option>${r}</option>`).join('');
-  const hz=document.getElementById('hist-prog-zona');if(hz&&hz.options.length<=1){const zs=[...new Set(EJECUCIONES.map(e=>e.zona))].sort();hz.innerHTML='<option value="">Todas las zonas</option>'+zs.map(z=>`<option>${z}</option>`).join('');}
+// ── Export pool to CSV ────────────────────────────
+function exportPool(){
+  const fecha=document.getElementById('pool-fecha')?.value||todayStr();
+  const pool=EJECUCIONES.filter(e=>e.fecha===fecha);
+  const hdr=['Fecha','General','Tarea','Zona','Sub zona','Estado','Responsable','Tiempo (min)','Nota'];
+  const data=pool.map(e=>[e.fecha,e.general,e.tarea,e.zona,e.sub||'',e.estado,e.resp||'Sin asignar',e.tiempo||'',e.nota||'']);
+  const csv=[hdr,...data].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='pool_'+fecha+'.csv';a.click();
 }
-
-let _execEstado='Listo';
-function selExecEstado(e){
-  _execEstado=e;
-  ['Listo','En proceso','Húmedo','Pendiente','No se hizo'].forEach(s=>{const b=document.getElementById('exbtn-'+s);if(b)b.style.boxShadow=s===e?'0 0 0 2px var(--g5)':'';});
-}
-
-function abrirModalEjecucion(eid){
-  const exec=EJECUCIONES.find(e=>e.id===eid);if(!exec)return;
-  const regla=REGLAS.find(r=>r.id===exec.reglaId);
-  document.getElementById('exec-eid').value=eid;
-  const ts=exec.tarea.includes('/')?exec.tarea.split('/')[1]:exec.tarea;
-  document.getElementById('exec-tarea-info').innerHTML=`<strong>${ts}</strong> · <span style="color:var(--s5)">${exec.zona}${exec.sub?' · '+exec.sub:''}</span>${regla?`<br><span style="font-size:11px;color:var(--s5)">Frecuencia: cada ${regla.freq} días</span>`:''}`;
-  document.getElementById('exec-fecha').value=exec.fecha||todayStr();
-  document.getElementById('exec-obs').value=exec.obs||'';
-  const er=document.getElementById('exec-resp');er.innerHTML=META.responsables.map(r=>`<option>${r}</option>`).join('');er.value=exec.resp;
-  selExecEstado(exec.estado==='Programada'?'Listo':exec.estado);
-  document.getElementById('exec-err').textContent='';
-  openModal('modal-exec');
-}
-
-function confirmarEjecucion(){
-  const eid=document.getElementById('exec-eid').value;
-  const exec=EJECUCIONES.find(e=>e.id===eid);if(!exec)return;
-  const resp=document.getElementById('exec-resp').value;
-  const fecha=document.getElementById('exec-fecha').value;
-  const obs=document.getElementById('exec-obs').value.trim();
-  if(!resp||!fecha){document.getElementById('exec-err').textContent='Responsable y fecha son obligatorios.';return;}
-  if(!_execEstado){document.getElementById('exec-err').textContent='Selecciona un estado.';return;}
-  exec.resp=resp;exec.fecha=fecha;exec.estado=_execEstado;exec.obs=obs;exec.ts=Date.now();
-  // Auto-generate next if completed
-  if(['Listo','Húmedo'].includes(_execEstado)){
-    const regla=REGLAS.find(r=>r.id===exec.reglaId);
-    if(regla&&regla.activa){
-      const next=addDays(fecha,regla.freq);
-      if(!EJECUCIONES.find(e=>e.reglaId===regla.id&&e.fecha===next)){
-        EJECUCIONES.push({id:uid2(),reglaId:regla.id,tarea:regla.tarea,zona:regla.zona,sub:regla.sub,resp:regla.resp,fecha:next,estado:next<=todayStr()?'Pendiente':'Programada',obs:'',ts:Date.now(),auto:true});
-      }
-    }
-  }
-  saveScheduler();closeModal('modal-exec');renderReglas();renderHistorialProg();
-}
-
+// ── Populate scheduler form selects ──────────────
 function populateProgForm(){
-  const pt=document.getElementById('prog-tarea');
-  if(pt&&pt.options.length===0){let h='<option value="">— Seleccionar tarea —</option>';Object.entries(META.tree||{}).forEach(([g,subs])=>{h+=`<optgroup label="${g}">`;subs.forEach(t=>{h+=`<option value="${t}">${t}</option>`;});h+=`</optgroup>`;});pt.innerHTML=h;}
+  const pg=document.getElementById('prog-general');
+  if(pg&&pg.options.length<=1){
+    pg.innerHTML='<option value="">— Categoría —</option>'+META.generales.map(g=>`<option>${g}</option>`).join('');
+  }
   const pz=document.getElementById('prog-zona');
-  if(pz&&pz.options.length===0)pz.innerHTML='<option value="">— Zona —</option>'+META.zonas.map(z=>`<option>${z}</option>`).join('');
-  const pr=document.getElementById('prog-resp');
-  if(pr&&pr.options.length===0)pr.innerHTML=META.responsables.map(r=>`<option>${r}</option>`).join('');
+  if(pz&&pz.options.length<=1) pz.innerHTML='<option value="">— Zona —</option>'+META.zonas.map(z=>`<option>${z}</option>`).join('');
   const pi=document.getElementById('prog-inicio');if(pi&&!pi.value)pi.value=todayStr();
 }
 
-// ════════════════════════════════════════
-//  ADMIN SYSTEM
-// ════════════════════════════════════════
-const SK_CUSTOM = 'jp_custom_v1'; // {zonas:[], categorias:{}, responsables:[], macros:{}}
-
-function loadCustom(){
-  try{
-    const d=JSON.parse(localStorage.getItem(SK_CUSTOM)||'{}');
-    // Merge custom zonas into META
-    if(d.zonas&&d.zonas.length){
-      d.zonas.forEach(z=>{if(!META.zonas.includes(z))META.zonas.push(z);});
-      META.zonas=META.zonas.sort();
-    }
-    // Merge custom tareas into META.tree
-    if(d.categorias){
-      Object.entries(d.categorias).forEach(([cat,tareas])=>{
-        if(!META.tree[cat])META.tree[cat]=[];
-        if(!META.generales.includes(cat))META.generales.push(cat);
-        tareas.forEach(t=>{if(!META.tree[cat].includes(t))META.tree[cat].push(t);});
-      });
-    }
-    // Merge custom responsables
-    if(d.responsables){
-      d.responsables.forEach(r=>{
-        if(!META.responsables.includes(r.nombre))META.responsables.push(r.nombre);
-        // Add to resp_groups
-        const grp=META.resp_groups.find(g=>g.label===r.tipo||(r.tipo==='Jardinero interno'&&g.label==='Jardineros internos'));
-        if(grp&&!grp.members.includes(r.nombre))grp.members.push(r.nombre);
-      });
-    }
-    // Merge macros
-    if(d.macros)Object.assign(META.macro_groups,d.macros);
-    return d;
-  }catch(e){return {};}
-}
-function getCustom(){
-  try{return JSON.parse(localStorage.getItem(SK_CUSTOM)||'{}');}catch(e){return {};}
-}
-function saveCustom(d){localStorage.setItem(SK_CUSTOM,JSON.stringify(d));}
-
-function addCategoria(){
-  if(!isOperador())return;
-  const name=document.getElementById('adm-new-cat').value.trim().toUpperCase();
-  if(!name){alert('Escribe el nombre de la categoría.');return;}
-  if(META.generales.includes(name)){alert('Esta categoría ya existe.');return;}
-  const d=getCustom();
-  if(!d.categorias)d.categorias={};
-  if(!d.categorias[name])d.categorias[name]=[];
-  if(!META.tree[name])META.tree[name]=[];
-  if(!META.generales.includes(name))META.generales.push(name);
-  saveCustom(d);
-  document.getElementById('adm-new-cat').value='';
-  renderAdminCatTree();populateFilters();
-  alert(`Categoría "${name}" agregada.`);
-}
-
-function addTareaAdmin(){
-  if(!isOperador())return;
-  const cat=document.getElementById('adm-tarea-cat').value;
-  const nombre=document.getElementById('adm-new-tarea').value.trim().toUpperCase();
-  if(!cat||!nombre){alert('Selecciona categoría y escribe el nombre.');return;}
-  const tarea=`${cat}/${nombre}`;
-  if(META.tree[cat]?.includes(tarea)){alert('Esta tarea ya existe en esa categoría.');return;}
-  const d=getCustom();
-  if(!d.categorias)d.categorias={};
-  if(!d.categorias[cat])d.categorias[cat]=[];
-  if(!d.categorias[cat].includes(tarea))d.categorias[cat].push(tarea);
-  if(!META.tree[cat])META.tree[cat]=[];
-  if(!META.tree[cat].includes(tarea))META.tree[cat].push(tarea);
-  if(!META.tareas.includes(tarea))META.tareas.push(tarea);
-  saveCustom(d);
-  document.getElementById('adm-new-tarea').value='';
-  renderAdminCatTree();populateFilters();
-  alert(`Tarea "${tarea}" agregada.`);
-}
-
-function addZona(){
-  if(!isOperador())return;
-  const nombre=document.getElementById('adm-new-zona').value.trim();
-  if(!nombre){alert('Escribe el nombre de la zona.');return;}
-  if(META.zonas.includes(nombre)){alert('Esta zona ya existe.');return;}
-  const d=getCustom();
-  if(!d.zonas)d.zonas=[];
-  d.zonas.push(nombre);
-  META.zonas.push(nombre);META.zonas.sort();
-  saveCustom(d);
-  document.getElementById('adm-new-zona').value='';
-  renderAdminZonas();populateFilters();
-  alert(`Zona "${nombre}" agregada.`);
-}
-
-function addResponsable(){
-  if(!isOperador())return;
-  const nombre=document.getElementById('adm-new-resp').value.trim();
-  const tipo=document.getElementById('adm-resp-tipo').value;
-  if(!nombre){alert('Escribe el nombre del responsable.');return;}
-  if(META.responsables.includes(nombre)){alert('Este responsable ya existe.');return;}
-  const d=getCustom();
-  if(!d.responsables)d.responsables=[];
-  d.responsables.push({nombre,tipo});
-  META.responsables.push(nombre);
-  // Add to resp_groups
-  const groupMap={'Jardinero interno':'Jardineros internos','Supervisor':'Supervisión / Jefatura','Externo':'Externos / Contratistas','Colectivo':'Colectivo / Ex'};
-  const grp=META.resp_groups.find(g=>g.label===groupMap[tipo]);
-  if(grp&&!grp.members.includes(nombre))grp.members.push(nombre);
-  saveCustom(d);
-  document.getElementById('adm-new-resp').value='';
-  renderAdminResp();populateFilters();
-  alert(`Responsable "${nombre}" agregado.`);
-}
-
-function renderAdminCatTree(){
-  const el=document.getElementById('adm-cat-tree');if(!el)return;
-  const d=getCustom();
-  const customCats=d.categorias||{};
-  // Populate cat select
-  const sel=document.getElementById('adm-tarea-cat');
-  if(sel)sel.innerHTML=META.generales.map(g=>`<option>${g}</option>`).join('');
-  // Build tree
-  el.innerHTML='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">'+
-  Object.entries(META.tree).sort().map(([g,tareas])=>{
-    const isCustomCat=!!customCats[g];
-    const customTareas=customCats[g]||[];
-    return`<div style="border:1px solid var(--s1);border-radius:var(--r-md);padding:10px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-       <div style="font-size:12px;font-weight:700;color:var(--g8)">${g}${isCustomCat?'<span style="font-size:9px;color:var(--g6);margin-left:5px">nuevo</span>':''}</div>
-       <span class="badge bgr" style="font-size:10px">${tareas.length}</span>
-      </div>
-      ${tareas.map(t=>{
-        const ts=t.includes('/')?t.split('/')[1]:t;
-        const isCust=customTareas.includes(t);
-        return`<div style="display:flex;align-items:center;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--s0);font-size:11px">
-          <span style="color:${isCust?'var(--g7)':'var(--s7)'}">• ${ts}${isCust?' ✨':''}</span>
-          ${isCust?`<button onclick="elimTarea('${g}','${t}')" style="border:none;background:none;cursor:pointer;color:var(--danger);font-size:13px;padding:0 2px" title="Eliminar">×</button>`:''}
-        </div>`;
-      }).join('')}
-     </div>`;
-  }).join('')+'</div>';
-}
-
-function elimTarea(cat,tarea){
-  if(!confirm(`¿Eliminar la tarea "${tarea}"?`))return;
-  const d=getCustom();
-  if(d.categorias?.[cat])d.categorias[cat]=d.categorias[cat].filter(t=>t!==tarea);
-  if(META.tree[cat])META.tree[cat]=META.tree[cat].filter(t=>t!==tarea);
-  META.tareas=META.tareas.filter(t=>t!==tarea);
-  saveCustom(d);renderAdminCatTree();populateFilters();
-}
-
-function renderAdminZonas(){
-  const el=document.getElementById('adm-zonas-list');if(!el)return;
-  const d=getCustom();
-  const custom=d.zonas||[];
-  const origCount=META.zonas.length-custom.length;
-  document.getElementById('adm-zona-count').textContent=META.zonas.length;
-  document.getElementById('adm-zona-orig').textContent=origCount;
-  document.getElementById('adm-zona-custom').textContent=custom.length;
-  if(!custom.length){el.innerHTML='<div class="empty" style="padding:1rem"><i class="ti ti-map-pin-off"></i>Sin zonas personalizadas aún.</div>';return;}
-  el.innerHTML=custom.map(z=>`<div class="wrow"><div style="flex:1;font-size:13px">${z}</div>
-    <button onclick="elimZona('${z.replace(/'/g,"\\'")}')" class="btn btn-sm btn-danger" style="padding:3px 8px"><i class="ti ti-trash"></i></button>
-   </div>`).join('');
-}
-
-function elimZona(zona){
-  if(!confirm(`¿Eliminar la zona "${zona}"?`))return;
-  const d=getCustom();d.zonas=(d.zonas||[]).filter(z=>z!==zona);
-  META.zonas=META.zonas.filter(z=>z!==zona);
-  saveCustom(d);renderAdminZonas();populateFilters();
-}
-
-function renderAdminMacros(){
-  const el=document.getElementById('adm-macros-edit');if(!el)return;
-  const macros=META.macro_groups||{};
-  el.innerHTML=Object.entries(macros).map(([nombre,datos])=>{
-    const gens=datos.generales||[];
-    return`<div class="card" style="margin-bottom:10px;padding:14px">
-      <div style="font-size:13px;font-weight:600;color:var(--g9);margin-bottom:8px"><i class="ti ${datos.icon||'ti-list'}" style="margin-right:6px"></i>${nombre}</div>
-      <div style="font-size:11px;color:var(--s5);margin-bottom:6px">Categorías asignadas:</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-       ${gens.map(g=>`<span class="badge bg" style="cursor:default">${g} <span onclick="removeFromMacro('${nombre}','${g}')" style="cursor:pointer;margin-left:3px;color:var(--danger)">×</span></span>`).join('')}
-      </div>
-      <div style="display:flex;gap:6px;align-items:center">
-       <select id="macro-add-${nombre.replace(/\s/g,'-')}" style="width:auto">
-        ${META.generales.filter(g=>!gens.includes(g)).map(g=>`<option>${g}</option>`).join('')}
-       </select>
-       <button class="btn btn-sm btn-p" onclick="addToMacro('${nombre}')" style="padding:5px 10px">+ Agregar categoría</button>
-      </div>
-     </div>`;
-  }).join('');
-}
-
-function addToMacro(macro){
-  const sid=`macro-add-${macro.replace(/\s/g,'-')}`;
-  const cat=document.getElementById(sid)?.value;if(!cat)return;
-  const d=getCustom();if(!d.macros)d.macros={};
-  if(!d.macros[macro])d.macros[macro]={generales:[]};
-  if(!META.macro_groups[macro].generales.includes(cat))META.macro_groups[macro].generales.push(cat);
-  if(!d.macros[macro].generales)d.macros[macro].generales=[];
-  if(!d.macros[macro].generales.includes(cat))d.macros[macro].generales.push(cat);
-  saveCustom(d);renderAdminMacros();renderDash();
-}
-function removeFromMacro(macro,cat){
-  const d=getCustom();if(!d.macros)d.macros={};
-  META.macro_groups[macro].generales=META.macro_groups[macro].generales.filter(g=>g!==cat);
-  if(d.macros[macro])d.macros[macro].generales=(d.macros[macro].generales||[]).filter(g=>g!==cat);
-  saveCustom(d);renderAdminMacros();renderDash();
-}
-
-function renderAdminResp(){
-  const el=document.getElementById('adm-resp-list');if(!el)return;
-  const d=getCustom();const custom=d.responsables||[];
-  if(!custom.length){el.innerHTML='<div class="empty" style="padding:1rem">Sin responsables personalizados.</div>';return;}
-  el.innerHTML=custom.map(r=>`<div class="wrow"><div style="flex:1"><div style="font-size:13px;font-weight:500">${r.nombre}</div><div style="font-size:11px;color:var(--s5)">${r.tipo}</div></div>
-    <button onclick="elimResponsable('${r.nombre.replace(/'/g,"\\'")}')" class="btn btn-sm btn-danger" style="padding:3px 8px"><i class="ti ti-trash"></i></button>
-   </div>`).join('');
-}
-function elimResponsable(nombre){
-  if(!confirm(`¿Eliminar "${nombre}"?`))return;
-  const d=getCustom();d.responsables=(d.responsables||[]).filter(r=>r.nombre!==nombre);
-  META.responsables=META.responsables.filter(r=>r!==nombre);
-  META.resp_groups.forEach(g=>{g.members=g.members.filter(m=>m!==nombre);});
-  saveCustom(d);renderAdminResp();populateFilters();
-}
-
-function swAdmin(el,id){
-  document.querySelectorAll('#admin-stabs .stab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
-  ['adm-categorias','adm-zonas','adm-macros','adm-responsables'].forEach(s=>document.getElementById(s).style.display='none');
-  document.getElementById(id).style.display='block';
-  if(id==='adm-categorias')renderAdminCatTree();
-  if(id==='adm-zonas')renderAdminZonas();
-  if(id==='adm-macros')renderAdminMacros();
-  if(id==='adm-responsables')renderAdminResp();
-}
+function isJardinero(){ return SESSION&&SESSION.role==='jardinero'; }
 
 // ════════════════════════════════════════
 //  JORNADA LABORAL & ALERTA FUERA DE HORARIO
